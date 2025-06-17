@@ -1270,9 +1270,6 @@
                 this.currentLayout = 0;
                 this.layouts = ['grid', 'line', 'circle'];
                 this.touchFeedback = null;
-                this.navigationMode = 'image'; // 'image' ou 'layout'
-                this.currentImageIndex = 0;
-                this.totalImages = 0;
                 
                 if (this.isMobile) {
                     this.init();
@@ -1299,24 +1296,24 @@
                 const navControls = document.createElement('div');
                 navControls.className = 'mobile-nav-controls';
                 navControls.innerHTML = `
-                    <button class="mobile-nav-btn" data-action="prev-image" title="Image précédente">
+                    <button class="mobile-nav-btn" data-action="prev-layout" title="Vue précédente">
                         ◀
                     </button>
                     <button class="mobile-nav-btn" data-action="layout" title="Changer de vue">
                         ⊞
                     </button>
-                    <button class="mobile-nav-btn" data-action="next-image" title="Image suivante">
+                    <button class="mobile-nav-btn" data-action="next-layout" title="Vue suivante">
                         ▶
                     </button>
-                    <button class="mobile-nav-btn" data-action="switch-mode" title="Basculer mode">
-                        ⚡
+                    <button class="mobile-nav-btn" data-action="scroll-top" title="Retour en haut">
+                        ↑
                     </button>
                 `;
 
                 // Ajouter les contrôles de mode
                 const modeIndicator = document.createElement('div');
                 modeIndicator.className = 'mobile-mode-indicator';
-                modeIndicator.textContent = 'Navigation par image';
+                modeIndicator.textContent = 'Défilez verticalement pour naviguer';
                 modeIndicator.style.cssText = `
                     position: fixed;
                     bottom: 80px;
@@ -1334,7 +1331,7 @@
                 // Ajouter l'indicateur de swipe
                 const swipeHint = document.createElement('div');
                 swipeHint.className = 'mobile-swipe-hint';
-                swipeHint.textContent = '← Image précédente/suivante → | ↑ Changer mode';
+                swipeHint.textContent = '⬇ Défilez pour voir les images ⬇ | ← → Changer vue';
 
                 // Ajouter la barre de progression
                 const progressBar = document.createElement('div');
@@ -1370,29 +1367,17 @@
 
             handleButtonAction(action) {
                 switch (action) {
-                    case 'prev-image':
-                        if (this.navigationMode === 'image') {
-                            this.navigateImage(-1);
-                        } else {
-                            this.navigateLayout(-1);
-                        }
+                    case 'prev-layout':
+                        this.navigateLayout(-1);
                         break;
-                    case 'next-image':
-                        if (this.navigationMode === 'image') {
-                            this.navigateImage(1);
-                        } else {
-                            this.navigateLayout(1);
-                        }
+                    case 'next-layout':
+                        this.navigateLayout(1);
                         break;
                     case 'layout':
-                        if (this.navigationMode === 'image') {
-                            this.focusCurrentImage();
-                        } else {
-                            this.cycleLayout();
-                        }
+                        this.cycleLayout();
                         break;
-                    case 'switch-mode':
-                        this.toggleNavigationMode();
+                    case 'scroll-top':
+                        this.scrollToTop();
                         break;
                 }
                 
@@ -1430,32 +1415,20 @@
                 const deltaX = this.touchEndX - this.touchStartX;
                 const deltaY = this.touchEndY - this.touchStartY;
                 
-                // Déterminer si c'est un swipe horizontal
-                if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > this.minSwipeDistance) {
-                    if (this.navigationMode === 'image') {
-                        if (deltaX > 0) {
-                            // Swipe vers la droite - image précédente
-                            this.navigateImage(-1);
-                        } else {
-                            // Swipe vers la gauche - image suivante
-                            this.navigateImage(1);
-                        }
-                    } else {
-                        if (deltaX > 0) {
-                            // Swipe vers la droite - layout précédent
-                            this.navigateLayout(-1);
-                        } else {
-                            // Swipe vers la gauche - layout suivant
-                            this.navigateLayout(1);
-                        }
-                    }
+                // Priorité au défilement vertical naturel - ne pas interférer
+                if (Math.abs(deltaY) > Math.abs(deltaX)) {
+                    // Laisser le défilement vertical naturel se faire
+                    return;
                 }
                 
-                // Swipe vertical pour changer de mode
-                else if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > this.minSwipeDistance) {
-                    if (deltaY < 0) {
-                        // Swipe vers le haut - basculer mode
-                        this.toggleNavigationMode();
+                // Déterminer si c'est un swipe horizontal significatif
+                if (Math.abs(deltaX) > this.minSwipeDistance * 1.5) {
+                    if (deltaX > 0) {
+                        // Swipe vers la droite - layout précédent
+                        this.navigateLayout(-1);
+                    } else {
+                        // Swipe vers la gauche - layout suivant
+                        this.navigateLayout(1);
                     }
                 }
             }
@@ -1550,119 +1523,49 @@
                 }, 150);
             }
 
-            // Nouvelles méthodes pour la navigation image par image
-            navigateImage(direction) {
-                const images = document.querySelectorAll('.image-wrapper');
-                this.totalImages = images.length;
-                
-                if (this.totalImages === 0) return;
-                
-                // Enlever le focus de l'image actuelle
-                const currentImage = images[this.currentImageIndex];
-                if (currentImage) {
-                    currentImage.classList.remove('mobile-focused');
-                }
-                
-                // Calculer nouvel index
-                this.currentImageIndex = (this.currentImageIndex + direction + this.totalImages) % this.totalImages;
-                
-                // Ajouter le focus à la nouvelle image
-                const newImage = images[this.currentImageIndex];
-                if (newImage) {
-                    newImage.classList.add('mobile-focused');
-                    this.scrollToImage(newImage);
-                }
-                
-                this.updateImageCounter();
-            }
-
-            focusCurrentImage() {
-                const images = document.querySelectorAll('.image-wrapper');
-                const currentImage = images[this.currentImageIndex];
-                if (currentImage && currentImage.click) {
-                    currentImage.click();
-                }
-            }
-
-            scrollToImage(imageElement) {
-                // Centrer l'image dans la vue si possible
-                imageElement.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center',
-                    inline: 'center'
+            // Méthode pour retourner en haut de page
+            scrollToTop() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
                 });
-            }
-
-            toggleNavigationMode() {
-                this.navigationMode = this.navigationMode === 'image' ? 'layout' : 'image';
-                this.updateModeIndicator();
-                this.updateButtonIcons();
                 
-                if (this.navigationMode === 'image') {
-                    this.initImageNavigation();
-                } else {
-                    this.clearImageFocus();
-                }
-            }
-
-            updateModeIndicator() {
-                const indicator = document.querySelector('.mobile-mode-indicator');
-                if (indicator) {
-                    indicator.textContent = this.navigationMode === 'image' ? 
-                        'Navigation par image' : 'Navigation par layout';
-                }
-            }
-
-            updateButtonIcons() {
-                const switchBtn = document.querySelector('[data-action="switch-mode"]');
-                const layoutBtn = document.querySelector('[data-action="layout"]');
-                
-                if (switchBtn) {
-                    switchBtn.textContent = this.navigationMode === 'image' ? '⚡' : '🎯';
-                }
-                
-                if (layoutBtn) {
-                    layoutBtn.textContent = this.navigationMode === 'image' ? '👁' : '⊞';
-                }
-            }
-
-            initImageNavigation() {
-                const images = document.querySelectorAll('.image-wrapper');
-                this.totalImages = images.length;
-                this.currentImageIndex = 0;
-                
-                // Ajouter le style pour le focus mobile
-                if (!document.querySelector('#mobile-focus-style')) {
-                    const style = document.createElement('style');
-                    style.id = 'mobile-focus-style';
-                    style.textContent = `
-                        .image-wrapper.mobile-focused {
-                            outline: 3px solid #ff4136 !important;
-                            outline-offset: 2px;
-                            z-index: 100 !important;
-                            box-shadow: 0 0 20px rgba(255, 65, 54, 0.8) !important;
-                        }
-                    `;
-                    document.head.appendChild(style);
-                }
-                
-                if (images.length > 0) {
-                    images[0].classList.add('mobile-focused');
-                    this.updateImageCounter();
-                }
-            }
-
-            clearImageFocus() {
-                const focusedImages = document.querySelectorAll('.image-wrapper.mobile-focused');
-                focusedImages.forEach(img => img.classList.remove('mobile-focused'));
-            }
-
-            updateImageCounter() {
+                // Feedback visuel
                 const progressBar = document.querySelector('.mobile-progress-bar');
-                if (progressBar && this.totalImages > 0) {
-                    const progress = ((this.currentImageIndex + 1) / this.totalImages) * 100;
-                    progressBar.style.width = `${progress}%`;
+                if (progressBar) {
+                    progressBar.style.width = '0%';
+                    setTimeout(() => {
+                        progressBar.style.width = '100%';
+                        setTimeout(() => {
+                            progressBar.style.width = '0%';
+                        }, 300);
+                    }, 100);
                 }
+            }
+
+            // Méthode pour suivre le défilement et mettre à jour la barre de progression
+            initScrollTracking() {
+                let ticking = false;
+                
+                const updateScrollProgress = () => {
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                    const progress = (scrollTop / docHeight) * 100;
+                    
+                    const progressBar = document.querySelector('.mobile-progress-bar');
+                    if (progressBar) {
+                        progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+                    }
+                    
+                    ticking = false;
+                };
+                
+                window.addEventListener('scroll', () => {
+                    if (!ticking) {
+                        requestAnimationFrame(updateScrollProgress);
+                        ticking = true;
+                    }
+                });
             }
         }
 
@@ -1676,7 +1579,7 @@
                 window.mobileNav = mobileNav;
                 
                 if (mobileNav.isMobile) {
-                    console.log('📱 Navigation mobile optimisée activée');
+                    console.log('📱 Navigation mobile avec défilement naturel activée');
                     
                     // Masquer le curseur custom sur mobile
                     const cursor = document.querySelector('.cursor');
@@ -1684,10 +1587,10 @@
                         cursor.style.display = 'none';
                     }
                     
-                    // Activer la navigation image par défaut
+                    // Activer le suivi du défilement
                     setTimeout(() => {
-                        mobileNav.initImageNavigation();
-                    }, 2000);
+                        mobileNav.initScrollTracking();
+                    }, 1000);
                 }
             }, 1000);
         });
