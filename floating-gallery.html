@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galerie Flottante - Inspirations Coiffures</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0d0d0d;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+            position: relative;
+        }
+
+        /* Grain noise overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMScgaGVpZ2h0PScxJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxmaWx0ZXIgaWQ9J24nPjxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249JzAuMicgLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0nMScgaGVpZ2h0PScxJyBmaWx0ZXI9InVybCgjbikiIGZpbGw9JyNmZmYnIC8+PC9zdmc+");
+            opacity: 0.05;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+        }
+
+        .floating-gallery {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .image-container {
+            position: absolute;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            opacity: 0.9;
+            filter: grayscale(30%) brightness(0.9);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .image-container.size-small {
+            width: 180px;
+            height: 120px;
+        }
+        
+        .image-container.size-medium {
+            width: 220px;
+            height: 160px;
+        }
+        
+        .image-container.size-large {
+            width: 280px;
+            height: 200px;
+        }
+        
+        .image-container.size-portrait {
+            width: 160px;
+            height: 240px;
+        }
+
+        .image-container:hover {
+            transform: scale(1.06) rotate(var(--rotate));
+            filter: grayscale(0%) brightness(1);
+            box-shadow: 0 0 15px rgba(255, 85, 60, 0.3), 0 25px 45px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .image-container:hover img {
+            transform: scale(1.1);
+        }
+
+        .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            color: white;
+            padding: 15px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .image-container:hover .image-overlay {
+            transform: translateY(0);
+        }
+
+        .image-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .image-description {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            gap: 25px;
+        }
+
+        .control-btn {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 85, 60, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 0 10px rgba(255,85,60,0.4);
+        }
+
+        .control-btn.active {
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Animation de montée continue des images */
+        @keyframes moveUp {
+            0%   { transform: translateY(120vh) scale(0.9); opacity: 0; }
+            10%  { opacity: 1; }
+            90%  { opacity: 1; }
+            100% { transform: translateY(-130vh) scale(0.9); opacity: 0; }
+        }
+
+        .story-text {
+            position: fixed;
+            bottom: 15%;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+            padding: 0 20px;
+            pointer-events: none;
+        }
+
+        .story-content {
+            display: inline-block;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .story-line {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+            margin: 0;
+            padding: 0 20px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Styles variés pour les textes */
+        .story-line.hero {
+            font-size: 3.2rem;
+            font-weight: 700;
+            color: #ff6b6b;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+
+        .story-line.quote {
+            font-size: 2.4rem;
+            font-style: italic;
+            font-weight: 300;
+            color: #f8f9fa;
+            max-width: 80%;
+            margin: 0 auto;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .story-line.fact {
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: #a5d8ff;
+            background: rgba(0, 0, 0, 0.3);
+            display: inline-block;
+            padding: 15px 25px;
+            border-radius: 50px;
+            backdrop-filter: blur(5px);
+        }
+
+        .story-line.region {
+            font-size: 2.8rem;
+            font-weight: 600;
+            color: #ffd43b;
+            text-shadow: 0 0 15px rgba(255, 212, 59, 0.5);
+            letter-spacing: 1px;
+        }
+
+        .story-line.conclusion {
+            font-size: 2.2rem;
+            font-weight: 300;
+            color: #ffffff;
+            text-align: right;
+            padding-right: 10%;
+            font-style: italic;
+        }
+
+        .story-line.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .center-title {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff5440;
+            font-size: 6rem;
+            font-weight: 800;
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            pointer-events: none;
+            z-index: 50;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="story-text" class="story-text">
+        <div class="story-content">
+            <p class="story-line hero" data-index="0">Cheveux d'Afrique :<br>Un Héritage Vivant</p>
+            <p class="story-line quote" data-index="1">« Les cheveux sont la couronne que l'on ne retire jamais »<br><span style="font-size: 0.7em; opacity: 0.8;">— Proverbe africain</span></p>
+            <p class="story-line fact" data-index="2">Saviez-vous ? Les Yoruba du Nigeria ont développé plus de 50 styles de tresses différents, chacun avec sa propre signification culturelle.</p>
+            <p class="story-line region" data-index="3">De l'Éthiopie au Sénégal,<br>chaque région raconte son histoire</p>
+            <p class="story-line conclusion" data-index="4">Plus qu'une coiffure,<br>une déclaration d'identité.</p>
+        </div>
+    </div>
+    <div class="container">
+        <header class="header">
+            <h1>✨ Galerie Flottante</h1>
+            <p>Inspirations Coiffures Afro - Animation Interactive</p>
+        </header>
+
+        <div class="floating-gallery" id="gallery">
+            <!-- Les images seront générées par JavaScript -->
+        </div>
+
+        <div class="controls">
+            <button class="control-btn active" onclick="startFloatingAnimation()">🚀 Accélérer</button>
+            <button class="control-btn" onclick="resetGallery()">🔄 Recommencer</button>
+            <button class="control-btn" onclick="toggleAnimationMode()">⏱ Ralentir</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration des vraies images de coiffures - TOUTES LES IMAGES
+        const images = [
+            { src: 'images-inspiration-coiffures-africain/048a68e7-6d68-441e-beaf-2df8fb072878.png', title: 'Style Afro Naturel', description: 'Coiffure naturelle élégante' },
+            { src: 'images-inspiration-coiffures-africain/0559abc8-612a-4029-ab11-94fa7addae42.png', title: 'Tresses Sophistiquées', description: 'Tressage moderne et stylé' },
+            { src: 'images-inspiration-coiffures-africain/0ee7be81-0e68-4395-8d7d-ebc12cd5b34b.png', title: 'Look Moderne', description: 'Style contemporain' },
+            { src: 'images-inspiration-coiffures-africain/105fae53-5078-4219-b680-6e95b68fcbe5.png', title: 'Style Coloré', description: 'Coiffure avec touches de couleur' },
+            { src: 'images-inspiration-coiffures-africain/12b22a5c-cf0e-4368-a301-dc00fbbba8e6.png', title: 'Coupe Courte', description: 'Style court et dynamique' },
+            { src: 'images-inspiration-coiffures-africain/133f5cfc-d3d6-4619-9128-13564a70d1a5.png', title: 'Boucles Naturelles', description: 'Texture naturelle mise en valeur' },
+            { src: 'images-inspiration-coiffures-africain/193d6ddb-56c2-4428-9419-46eb026535ed.png', title: 'Tresses Longues', description: 'Tressage élaboré et long' },
+            { src: 'images-inspiration-coiffures-africain/1adaf727-ef73-4c82-9848-7b69bdfe13a5.png', title: 'Style Festif', description: 'Coiffure pour occasions spéciales' },
+            { src: 'images-inspiration-coiffures-africain/213f9864-1021-4291-87d0-711c60d926ca.png', title: 'Look Professionnel', description: 'Style adapté au travail' },
+            { src: 'images-inspiration-coiffures-africain/233b357d-0350-4174-b320-cf729e7da468.png', title: 'Style Décontracté', description: 'Look casual et confortable' },
+            { src: 'images-inspiration-coiffures-africain/2e5b5d56-07cf-4bd4-b8b8-11d8bc7cc9bf.png', title: 'Coupe Géométrique', description: 'Lignes nettes et précises' },
+            { src: 'images-inspiration-coiffures-africain/337046c4-031d-42bc-9a09-49b18b8853ee.png', title: 'Style Bohème', description: 'Look libre et artistique' },
+            { src: 'images-inspiration-coiffures-africain/374bd60c-c35d-4396-b19c-746657c252a1.png', title: 'Look Vintage', description: 'Style rétro revisité' },
+            { src: 'images-inspiration-coiffures-africain/3e5a2bb4-1e9f-4579-95d0-a08f4daae8c3.png', title: 'Style Moderne', description: 'Tendance actuelle' },
+            { src: 'images-inspiration-coiffures-africain/3e5e22ce-f43f-4edf-8036-c1d24e12c6d2.png', title: 'Coupe Asymétrique', description: 'Style audacieux et original' },
+            { src: 'images-inspiration-coiffures-africain/50f6a168-715f-467f-9f52-ce08398d6cea.png', title: 'Style Romantique', description: 'Douceur et féminité' },
+            { src: 'images-inspiration-coiffures-africain/51b615f7-6a32-4bf3-b3c8-7b2598fe8ee9.png', title: 'Look Sportif', description: 'Pratique et stylé' },
+            { src: 'images-inspiration-coiffures-africain/54d49991-c607-4223-b549-fe8d08cc97fe.png', title: 'Style Élégant', description: 'Raffinement et classe' },
+            { src: 'images-inspiration-coiffures-africain/56905e4d-4496-4241-8c1e-18ebd9876195.png', title: 'Coupe Créative', description: 'Innovation et créativité' },
+            { src: 'images-inspiration-coiffures-africain/5f7fd6b4-1531-41ee-aa27-20d0dedae753.png', title: 'Style Classique', description: 'Intemporel et chic' },
+            { src: 'images-inspiration-coiffures-africain/66041364-62c8-415a-9c35-dab10345c28d.png', title: 'Look Urbain', description: 'Style de la ville' },
+            { src: 'images-inspiration-coiffures-africain/664a4222-b9ed-41f6-93b3-51c373203c6a.png', title: 'Style Tropical', description: 'Inspiration exotique' },
+            { src: 'images-inspiration-coiffures-africain/6684df14-bf64-4e1a-b422-2dbdec5b7c03.png', title: 'Coiffure de Soirée', description: 'Glamour et sophistication' },
+            { src: 'images-inspiration-coiffures-africain/6cbf57d2-a298-478f-a892-a157807dc8e4.png', title: 'Style Minimaliste', description: 'Simplicité et élégance' },
+            { src: 'images-inspiration-coiffures-africain/71810122-7844-47c1-aa8c-1e7186ed075f.png', title: 'Look Artistique', description: 'Expression créative' },
+            { src: 'images-inspiration-coiffures-africain/71a775f1-db13-4d19-8aff-ddb8f45e18f7.png', title: 'Style Texturé', description: 'Jeu de textures raffiné' },
+            { src: 'images-inspiration-coiffures-africain/75e863cd-ab70-42bb-a4e0-addc0bfa3e6f.png', title: 'Coupe Pixie', description: 'Style court et audacieux' },
+            { src: 'images-inspiration-coiffures-africain/775d11be-f907-403f-a6a9-d2348da8ad36.png', title: 'Look Glamour', description: 'Éclat et sophistication' },
+            { src: 'images-inspiration-coiffures-africain/7ce8e36d-a4c8-4076-a498-3bf89c0ef98d.png', title: 'Style Naturel', description: 'Beauté authentique' },
+            { src: 'images-inspiration-coiffures-africain/7dafe693-b94b-4876-b850-46b74f907f7d.png', title: 'Coiffure Structurée', description: 'Architecture capillaire' },
+            { src: 'images-inspiration-coiffures-africain/7e9d423b-948e-49a3-b6e6-c3edec7cfc19.png', title: 'Look Fluide', description: 'Mouvement et grâce' },
+            { src: 'images-inspiration-coiffures-africain/8d4920dd-a2cf-445a-bf73-a1a22f20c978.png', title: 'Style Sophistiqué', description: 'Raffinement ultime' },
+            { src: 'images-inspiration-coiffures-africain/8f814cb6-ed98-4f21-af15-d63d565e8db3.png', title: 'Coupe Moderne', description: 'Tendance contemporaine' },
+            { src: 'images-inspiration-coiffures-africain/9240b764-b37e-418b-8526-0ac3524082a6.png', title: 'Style Dynamique', description: 'Énergie et mouvement' },
+            { src: 'images-inspiration-coiffures-africain/9497ead6-5e9a-45d8-84ab-6f1694276f02.png', title: 'Look Chic', description: 'Élégance parisienne' },
+            { src: 'images-inspiration-coiffures-africain/98807c75-8e19-45b3-95f4-5ffd1dcc6940.png', title: 'Style Bohème Chic', description: 'Liberté et élégance' },
+            { src: 'images-inspiration-coiffures-africain/9a01a209-bd03-4fcc-9801-bbfb57c549a8.png', title: 'Coiffure Artistique', description: 'Créativité pure' },
+            { src: 'images-inspiration-coiffures-africain/a1548b68-4652-4815-9169-133f2fe53610.png', title: 'Look Métropolitain', description: 'Style urbain moderne' },
+            { src: 'images-inspiration-coiffures-africain/a9359946-d2ef-4443-a269-144e4eec4235.png', title: 'Style Avant-garde', description: 'Innovation capillaire' },
+            { src: 'images-inspiration-coiffures-africain/af49d2ae-96cc-466a-bc4a-68ccc9091322.png', title: 'Coupe Tendance', description: 'Mode actuelle' },
+            { src: 'images-inspiration-coiffures-africain/b5b8baf0-56d9-46a1-a7bb-6fec91984111.png', title: 'Look Festif', description: 'Célébration et joie' },
+            { src: 'images-inspiration-coiffures-africain/b6ee79eb-58e7-4fbb-bccb-e373ba24084a.png', title: 'Style Royal', description: 'Majesté et prestance' },
+            { src: 'images-inspiration-coiffures-africain/bb72d7d2-8079-446c-b824-996d09223f7c.png', title: 'Coiffure Élaborée', description: 'Complexité maîtrisée' },
+            { src: 'images-inspiration-coiffures-africain/bd5c34ba-f73a-4d87-8366-04271e204b1b.png', title: 'Look Contemporain', description: 'Esprit du temps' },
+            { src: 'images-inspiration-coiffures-africain/c49ef9e9-1e9a-4b88-a8f3-d69a9070165c.png', title: 'Style Zen', description: 'Sérénité et harmonie' },
+            { src: 'images-inspiration-coiffures-africain/c8241bf9-43b7-4e91-98b1-66c3229b1c10.png', title: 'Coupe Audacieuse', description: 'Courage et originalité' },
+            { src: 'images-inspiration-coiffures-africain/c9dc96e1-25e2-4eab-b8c2-7a42816034d8.png', title: 'Look Épuré', description: 'Pureté des lignes' },
+            { src: 'images-inspiration-coiffures-africain/cac1daf7-115c-45c4-82cf-fce0cc0ac1ad.png', title: 'Style Expressif', description: 'Personnalité affirmée' },
+            { src: 'images-inspiration-coiffures-africain/cb1f055a-b3ed-459e-b572-1ff97b7b10df.png', title: 'Coiffure Harmonieuse', description: 'Équilibre parfait' },
+            { src: 'images-inspiration-coiffures-africain/d011c66c-cab0-4d58-9cc0-04d09453e0b6.png', title: 'Look Inspirant', description: 'Source d\'inspiration' },
+            { src: 'images-inspiration-coiffures-africain/d0896f68-7113-4b7d-9dac-45c2863844a8.png', title: 'Style Lumineux', description: 'Éclat naturel' },
+            { src: 'images-inspiration-coiffures-africain/d37ce9df-6761-43dc-892d-cfb21308c1cd.png', title: 'Coupe Innovante', description: 'Nouveauté créative' },
+            { src: 'images-inspiration-coiffures-africain/d7d6906e-ae27-4ef6-becb-95fc00e37cf1.png', title: 'Look Magnétique', description: 'Attraction irrésistible' },
+            { src: 'images-inspiration-coiffures-africain/d8cd9691-ad65-48dc-a903-8497d2612c20.png', title: 'Style Captivant', description: 'Charme envoûtant' },
+            { src: 'images-inspiration-coiffures-africain/e72c0550-8324-4cc0-9f3a-38caf6f4862c.png', title: 'Coiffure Sublime', description: 'Beauté transcendante' },
+            { src: 'images-inspiration-coiffures-africain/e9974373-243f-468b-93d0-bb8436021b6f.png', title: 'Look Enchanteur', description: 'Magie capillaire' },
+            { src: 'images-inspiration-coiffures-africain/f10e668f-8c42-464d-9cec-3f5b5436f779.png', title: 'Style Éblouissant', description: 'Éclat extraordinaire' },
+            { src: 'images-inspiration-coiffures-africain/f2e0d5f7-2bcf-4d0d-a24c-24cc4fb3dedc.png', title: 'Coupe Remarquable', description: 'Excellence visible' },
+            { src: 'images-inspiration-coiffures-africain/fb72dfba-3ddb-4d5d-9598-e80357b63ad3.png', title: 'Look Exceptionnel', description: 'Perfection atteinte' }
+        ];
+
+        let gallery = document.getElementById('gallery');
+        // Ajout du titre central
+        const centerTitle = document.createElement('div');
+        centerTitle.className = 'center-title';
+        centerTitle.innerHTML = '<h1>Inspirations<br>Coiffures Afro</h1>';
+        document.body.appendChild(centerTitle);
+
+        // Gestion du défilement du texte
+        const storyLines = document.querySelectorAll('.story-line');
+        let currentLine = 0;
+        const totalLines = storyLines.length;
+
+        function showNextLine() {
+            // Masquer la ligne actuelle
+            storyLines.forEach(line => line.classList.remove('active'));
+            
+            // Afficher la nouvelle ligne
+            storyLines[currentLine].classList.add('active');
+            
+            // Passer à la ligne suivante
+            currentLine = (currentLine + 1) % totalLines;
+            
+            // Planifier le prochain changement (plus rapide que l'animation des images)
+            setTimeout(showNextLine, 8000); // 8 secondes par ligne
+        }
+
+        // Démarrer l'animation du texte
+        setTimeout(showNextLine, 3000); // Démarrer après 3 secondes
+        
+
+        function createImageElements() {
+            gallery.innerHTML = '';
+            
+            const sizeOptions = ['small', 'medium', 'large', 'portrait'];
+            const positions = [
+                // Positions prédéfinies pour éviter le centre
+                { x: 5, y: 10 }, { x: 85, y: 15 }, { x: 15, y: 75 }, { x: 75, y: 80 },
+                { x: 10, y: 40 }, { x: 80, y: 45 }, { x: 25, y: 20 }, { x: 70, y: 25 },
+                { x: 20, y: 85 }, { x: 85, y: 70 }, { x: 5, y: 60 }, { x: 90, y: 35 },
+                { x: 30, y: 5 }, { x: 60, y: 90 }, { x: 12, y: 25 }, { x: 88, y: 55 },
+                { x: 35, y: 75 }, { x: 65, y: 10 }, { x: 8, y: 85 }, { x: 92, y: 20 }
+            ];
+
+            // Limiter à 12 images pour éviter l'encombrement
+            const selectedImages = images.slice(0, 12);
+            
+            selectedImages.forEach((imageData, index) => {
+                const container = document.createElement('div');
+                
+                // Choix aléatoire d'une taille et position
+                const randomSize = sizeOptions[Math.floor(Math.random() * sizeOptions.length)];
+                const position = positions[index % positions.length];
+                
+                container.className = `image-container size-${randomSize}`;
+                
+                // Positionnement absolu
+                container.style.left = `${position.x}%`;
+                container.style.top = `${position.y}%`;
+                
+                // Animation d'apparition (optionnel, peut être affiné)
+                container.style.animation = `moveUp 50s linear infinite`;
+                container.style.animationDelay = `${(index * 2).toFixed(1)}s`;
+                container.style.willChange = 'transform, opacity';
+                // rotation variable pour hover
+                container.style.setProperty('--rotate', `${(Math.random()*4 - 2).toFixed(2)}deg`);
+
+                const img = document.createElement('img');
+                img.src = imageData.src;
+                img.alt = imageData.title;
+                img.loading = 'lazy';
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover'; // Assure que l'image remplit le conteneur
+
+                const overlay = document.createElement('div');
+                overlay.className = 'image-overlay';
+                overlay.innerHTML = `
+                    <h3>${imageData.title}</h3>
+                    <p>${imageData.description}</p>
+                `;
+
+                container.appendChild(img);
+                container.appendChild(overlay);
+                
+                gallery.appendChild(container);
+                
+                // Déclencher l'animation d'apparition
+                setTimeout(() => {
+                    container.style.opacity = '0.9';
+                    container.style.transform = 'translateY(0)';
+                }, 50 + index * 50); // Petit délai pour l'effet cascade
+            });
+        }
+
+        function speedUp() {
+            // Temporairement désactivé
+            console.log('Speed Up: Animation de défilement non active avec la disposition masonry.');
+        }
+
+        function slowDown() {
+            // Temporairement désactivé
+            console.log('Slow Down: Animation de défilement non active avec la disposition masonry.');
+        }
+
+        function resetGallery() {
+            createImageElements();
+        }
+
+        function startFloatingAnimation() {
+            speedUp();
+        }
+
+        function toggleAnimationMode() {
+            slowDown();
+        }
+
+        // Initialiser la galerie
+        window.addEventListener('load', () => {
+            createImageElements();
+        });
+
+        // Redimensionner la galerie si la fenêtre change
+        window.addEventListener('resize', () => {
+            createImageElements();
+        });
+    </script>
+</body>
+</html>

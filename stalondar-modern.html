@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galerie Interactive et Immersive - Projet Final</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Prata&family=Space+Grotesk:wght@300;400;500;700&display=swap');
+        :root { --accent-color: #ff4136; --music-accent: #1db954; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0a0a; height: 100vh; overflow: hidden; font-family: 'Space Grotesk', sans-serif; position: relative; cursor: none; }
+        .cursor { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 10000; mix-blend-mode: difference; }
+        .cursor-ring { width: 40px; height: 40px; border: 1px solid white; border-radius: 50%; transform: translate(-50%, -50%); transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, background-color 0.3s ease; backdrop-filter: invert(1) blur(1px); -webkit-backdrop-filter: invert(1) blur(1px); }
+        .cursor.magnetic .cursor-ring { width: 80px; height: 80px; background-color: rgba(255, 255, 255, 0.1); border-color: transparent; }
+        
+        .container { 
+            position: relative; width: 100%; height: 100%; overflow: hidden; perspective: 1500px;
+            transition: filter 0.5s ease, transform 0.5s ease;
+        }
+        .container.modal-open {
+            filter: blur(10px);
+            transform: scale(0.98);
+        }
+
+        .background-elements { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+        .huge-background-text { position: absolute; font-family: 'Bebas Neue', sans-serif; font-size: clamp(25rem, 50vw, 55rem); will-change: transform, opacity; line-height: 1; white-space: nowrap; animation: fadeInOut 20s ease-in-out; pointer-events: none; }
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; transform: scale(0.95) rotate(var(--rotate)); } 20%, 80% { opacity: 1; transform: scale(1) rotate(var(--rotate)); } }
+        
+        #gallery-container { position: absolute; inset: 0; z-index: 5; }
+        .gallery-item { position: absolute; will-change: transform; transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1); }
+        .image-container { border-radius: 12px; overflow: hidden; box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5); background: #111; z-index: 10; cursor: pointer; }
+        .image-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+        .image-container:hover img { transform: scale(1.1); }
+        .artistic-quote { z-index: 50; color: #e0e0e0; max-width: 450px; line-height: 1.6; font-family: 'Prata', serif; font-size: 1.2rem; text-shadow: 0 2px 10px #000; }
+        
+        .controls { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 2100; display: flex; gap: 10px; background: rgba(18, 18, 18, 0.6); backdrop-filter: blur(15px); padding: 10px; border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .controls .control-btn { background: rgba(255, 255, 255, 0.1); border: none; border-radius: 10px; color: #ccc; padding: 10px 15px; font-size: 0.9rem; transition: all 0.3s ease; }
+        .controls .control-btn.active, .controls .control-btn:hover { color: white; background-color: var(--accent-color); }
+        
+        .pause-indicator { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 5rem; color: white; z-index: 2200; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; text-shadow: 0 0 20px black; }
+        .pause-indicator.visible { opacity: 1; }
+        
+        .music-menu { position: fixed; top: 50%; right: 25px; transform: translateY(-50%); z-index: 2000; background: rgba(18, 18, 18, 0.8); backdrop-filter: blur(25px); border-radius: 24px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5); transition: width 0.5s, height 0.5s, border-radius 0.5s, opacity 0.5s; width: 280px; }
+        .music-menu.dragging { cursor: grabbing; transition: none; }
+        .music-menu.collapsed { width: 64px; height: 64px; padding: 0; border-radius: 32px; display: flex; align-items: center; justify-content: center; }
+        .music-toggle { background: transparent; border: none; border-radius: 50%; width: 60px; height: 60px; color: white; font-size: 1.8rem; transition: all 0.4s ease; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; }
+        .music-menu.collapsed .music-toggle { margin: 0; }
+        .music-toggle:hover { transform: scale(1.1) rotate(15deg); color: var(--music-accent); }
+        .music-content { transition: all 0.4s ease; overflow: hidden; }
+        .music-menu.collapsed .music-content { opacity: 0; visibility: hidden; height: 0; }
+        .music-title { color: #fff; font-size: 0.9rem; font-weight: 500; margin-bottom: 15px; text-align: center; letter-spacing: 1px; text-transform: uppercase; cursor: grab; }
+        .music-title:active { cursor: grabbing; }
+        .music-controls { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; align-items: center; }
+        .music-controls .control-btn { background: rgba(255, 255, 255, 0.08); border: none; border-radius: 50%; color: #999; width: 40px; height: 40px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; }
+        .music-controls .control-btn:hover { background-color: rgba(255, 255, 255, 0.15); color: #fff; }
+        .music-controls .play-btn { width: 50px; height: 50px; font-size: 1.1rem; }
+        .music-controls .control-btn.active { color: white; background-color: var(--music-accent); }
+        .playlist { max-height: 150px; overflow-y: auto; padding-right: 5px; }
+        .playlist::-webkit-scrollbar { width: 4px; }
+        .playlist::-webkit-scrollbar-track { background: transparent; }
+        .playlist::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 2px; }
+        .song-item { border-radius: 8px; padding: 10px; margin-bottom: 5px; transition: background-color 0.3s ease; cursor: pointer; }
+        .song-item:hover { background: rgba(255, 255, 255, 0.05); }
+        .song-item.playing .song-title { color: var(--music-accent); }
+        .song-title { color: #ddd; font-size: 0.9rem; font-weight: 400; }
+        .volume-control { margin-top: 15px; }
+        .volume-slider { width: 100%; -webkit-appearance: none; appearance: none; height: 4px; background: rgba(255, 255, 255, 0.2); border-radius: 2px; outline: none; }
+        .volume-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; background: #fff; border-radius: 50%; }
+
+        .modal { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); 
+            backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 10001; 
+            opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0s 0.4s; 
+        }
+        .modal.active { opacity: 1; visibility: visible; transition: opacity 0.4s ease; }
+        .modal-content { position: relative; max-width: 90vw; max-height: 90vh; transform: scale(0.95); transition: transform 0.4s ease; }
+        .modal.active .modal-content { transform: scale(1); }
+        .modal-image { width: 100%; height: 100%; object-fit: contain; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+        .close-modal { position: absolute; top: -15px; right: -15px; background: rgba(0,0,0,0.5); border: 2px solid white; border-radius: 50%; width: 40px; height: 40px; color: white; font-size: 22px; transition: all 0.3s ease; cursor: pointer; }
+        .close-modal:hover { background: var(--accent-color); transform: rotate(90deg); border-color: var(--accent-color);}
+    </style>
+</head>
+<body>
+    <div class="cursor"><div class="cursor-ring"></div></div>
+    
+    <div class="container" id="mainContainer">
+        <div class="background-elements" id="background-elements-container"></div>
+        <div id="gallery-container"></div>
+        <div class="pause-indicator" id="pause-indicator">PAUSE</div>
+        
+        <div class="music-menu collapsed magnetic-target" id="musicMenu">
+            <button class="music-toggle magnetic-target" id="musicToggle">🎵</button>
+            <div class="music-content">
+                <div class="music-title" id="musicMenuHandle">Ambiance Sonore</div>
+                <div class="music-controls">
+                    <button class="control-btn magnetic-target" id="prevBtn">⏮️</button>
+                    <button class="control-btn play-btn magnetic-target" id="playBtn">▶️</button>
+                    <button class="control-btn magnetic-target" id="nextBtn">⏭️</button>
+                </div>
+                <div class="playlist" id="playlist"></div>
+                <div class="volume-control">
+                    <input type="range" class="volume-slider magnetic-target" id="volumeSlider" min="0" max="1" step="0.01" value="0.7">
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="control-btn magnetic-target" id="pauseBtn">⏸️ Pause</button>
+            <button class="control-btn magnetic-target" onclick="gallery.reset()">🔄 Recommencer</button>
+        </div>
+    </div>
+
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <button class="close-modal magnetic-target" id="closeModalBtn">×</button>
+            <img class="modal-image" id="modalImage" src="" alt="">
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const narrativeTexts = [ { text: "La richesse capillaire de l'Afrique : des systèmes de communication sociale et d'identité culturelle." }, { text: "Loin d'être de simples parures, ces coiffures constituaient des marqueurs identitaires essentiels." } ];
+        const hugeWords = ["STYLE", "CULTURE", "ART", "BEAUTÉ", "HÉRITAGE", "AFRO"];
+        const images = [
+            { src: 'images-inspiration-coiffures-africain/048a68e7-6d68-441e-beaf-2df8fb072878.png', title: 'Élégance Azur' }, { src: 'images-inspiration-coiffures-africain/0559abc8-612a-4029-ab11-94fa7addae42.png', title: 'Tresses Royales' }, { src: 'images-inspiration-coiffures-africain/0ee7be81-0e68-4395-8d7d-ebc12cd5b34b.png', title: 'Silhouette Moderne' }, { src: 'images-inspiration-coiffures-africain/105fae53-5078-4219-b680-6e95b68fcbe5.png', title: 'Vibrations Colorées' }, { src: 'images-inspiration-coiffures-africain/12b22a5c-cf0e-4368-a301-dc00fbbba8e6.png', title: 'Coupe Structurée' }, { src: 'images-inspiration-coiffures-africain/133f5cfc-d3d6-4619-9128-13564a70d1a5.png', title: 'Boucles Libres' }, { src: 'images-inspiration-coiffures-africain/193d6ddb-56c2-4428-9419-46eb026535ed.png', title: 'Cascade de Tresses' }, { src: 'images-inspiration-coiffures-africain/1adaf727-ef73-4c82-9848-7b69bdfe13a5.png', title: 'Éclat Festif' }, { src: 'images-inspiration-coiffures-africain/213f9864-1021-4291-87d0-711c60d926ca.png', title: 'Charisme Professionnel' }
+        ];
+        
+        // --- INTERACTIVE GALLERY CLASS ---
+        class InteractiveGallery {
+            constructor(containerId) {
+                this.container = document.getElementById(containerId);
+                this.bgContainer = document.getElementById('background-elements-container');
+                this.items = [];
+                this.scroll = { current: 0, target: 0, velocity: 0, baseVelocity: -0.15, friction: 0.96, isPaused: false };
+                this.virtualHeight = 0;
+                this.hugeTextTimer = null;
+                this.init();
+            }
+
+            init() { this.populate(); this.addEventListeners(); this.startHugeTextCycle(); this.update(); }
+            
+            populate() {
+                this.container.innerHTML = '';
+                this.items = [];
+                const allContent = [...images, ...narrativeTexts, ...images, ...images]; 
+                let currentY = 0;
+
+                const lanes = [ { xRange: [0.05, 0.25] }, { xRange: [0.38, 0.58] }, { xRange: [0.70, 0.90] } ];
+                let lastLaneIndex = -1;
+
+                for(let i = 0; i < 40; i++) {
+                    const content = allContent[i % allContent.length];
+                    const el = document.createElement('div');
+                    el.className = 'gallery-item';
+                    
+                    let laneIndex;
+                    do { laneIndex = Math.floor(Math.random() * lanes.length); } while(laneIndex === lastLaneIndex);
+                    lastLaneIndex = laneIndex;
+                    const lane = lanes[laneIndex];
+
+                    if (content.src) {
+                        const sizes = [{w:300, h:220}, {w:380, h:280}, {w:450, h:340}, {w:280, h:400}];
+                        const size = sizes[Math.floor(Math.random() * sizes.length)];
+                        el.innerHTML = `<div class="image-container magnetic-target" style="width:${size.w}px; height:${size.h}px;"><img src="${content.src}" loading="lazy" /></div>`;
+                        el.querySelector('.image-container').addEventListener('click', (e) => { e.stopPropagation(); openModal(content.src); });
+                        
+                        const x = (lane.xRange[0] + Math.random() * (lane.xRange[1] - lane.xRange[0])) * window.innerWidth - size.w / 2;
+                        const itemData = { el, y: currentY, x, rotation: (Math.random() - 0.5) * 8, height: size.h };
+                        this.items.push(itemData);
+                        currentY += size.h + 250;
+                    } else {
+                        el.innerHTML = `<div class="artistic-quote">${content.text}</div>`;
+                        const x = (lane.xRange[0] + Math.random() * (lane.xRange[1] - lane.xRange[0])) * window.innerWidth - 225;
+                        const itemData = { el, y: currentY, x, rotation: (Math.random() - 0.5) * 4, height: 200 };
+                        this.items.push(itemData);
+                        currentY += 200 + 300;
+                    }
+                    this.container.appendChild(el);
+                }
+                this.virtualHeight = currentY;
+            }
+
+            addEventListeners() {
+                window.addEventListener('wheel', e => { if (!this.scroll.isPaused) { this.scroll.velocity += e.deltaY * 0.04; } });
+                document.getElementById('pauseBtn').addEventListener('click', () => this.togglePause());
+                window.addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); this.togglePause(); } });
+            }
+            
+            togglePause(forceState = null) {
+                this.scroll.isPaused = forceState !== null ? forceState : !this.scroll.isPaused;
+                document.getElementById('pauseBtn').classList.toggle('active', this.scroll.isPaused);
+                document.getElementById('pauseBtn').textContent = this.scroll.isPaused ? '▶️ Reprendre' : '⏸️ Pause';
+                document.getElementById('pause-indicator').classList.toggle('visible', this.scroll.isPaused);
+            }
+
+            update() {
+                if (!this.scroll.isPaused) {
+                    this.scroll.target += this.scroll.velocity;
+                    this.scroll.target += this.scroll.baseVelocity;
+                    this.scroll.velocity *= this.scroll.friction;
+                }
+                this.scroll.current += (this.scroll.target - this.scroll.current) * 0.08; 
+                for (const item of this.items) {
+                    const screenPos = (item.y - this.scroll.current) % this.virtualHeight;
+                    let y = screenPos;
+                    if(screenPos < -item.height) y = screenPos + this.virtualHeight;
+                    else if (screenPos > window.innerHeight) y = screenPos - this.virtualHeight;
+                    item.el.style.transform = `translate3d(${item.x}px, ${y}px, 0) rotateZ(${item.rotation}deg)`;
+                }
+                requestAnimationFrame(this.update.bind(this));
+            }
+
+            startHugeTextCycle() {
+                const createText = () => {
+                    const word = hugeWords[Math.floor(Math.random() * hugeWords.length)];
+                    const el = document.createElement('div');
+                    el.className = 'huge-background-text';
+                    el.textContent = word;
+                    const styleType = Math.random();
+                    if (styleType < 0.5) { el.style.zIndex = '6'; el.style.color = 'rgba(255, 255, 255, 0.06)';
+                    } else { el.style.zIndex = '1'; el.style.color = 'transparent'; el.style.webkitTextStroke = '1px rgba(255, 255, 255, 0.15)'; }
+                    el.style.setProperty('--rotate', `${(Math.random() - 0.5) * 20}deg`);
+                    el.style.top = `${Math.random() * 50}%`;
+                    el.style.left = `${Math.random() * 50}%`;
+                    this.bgContainer.appendChild(el);
+                    setTimeout(() => el.remove(), 19900);
+                };
+                createText();
+                this.hugeTextTimer = setInterval(createText, 10000);
+            }
+            
+            reset() { this.scroll.target = 0; this.scroll.velocity = 0; this.populate(); magneticCursor.updateTargets(); clearInterval(this.hugeTextTimer); this.startHugeTextCycle(); }
+        }
+
+        // --- DRAGGABLE CLASS ---
+        class Draggable {
+            constructor(element, handle) {
+                this.element = element; this.handle = handle || element; this.isDragging = false; this.offsetX = 0; this.offsetY = 0; this.init();
+            }
+            init() { this.handle.addEventListener('mousedown', this.startDrag.bind(this)); }
+            startDrag(e) {
+                e.preventDefault(); this.isDragging = true; this.element.classList.add('dragging');
+                this.offsetX = e.clientX - this.element.offsetLeft; this.offsetY = e.clientY - this.element.offsetTop;
+                if (this.element.style.right) { this.element.style.left = `${this.element.offsetLeft}px`; this.element.style.top = `${this.element.offsetTop}px`; this.element.style.right = ''; this.element.style.transform = ''; }
+                window.addEventListener('mousemove', this.drag.bind(this)); window.addEventListener('mouseup', this.stopDrag.bind(this));
+            }
+            drag(e) {
+                if (!this.isDragging) return;
+                let newX = e.clientX - this.offsetX; let newY = e.clientY - this.offsetY;
+                newX = Math.max(0, Math.min(newX, window.innerWidth - this.element.offsetWidth));
+                newY = Math.max(0, Math.min(newY, window.innerHeight - this.element.offsetHeight));
+                this.element.style.left = `${newX}px`; this.element.style.top = `${newY}px`;
+            }
+            stopDrag() { this.isDragging = false; this.element.classList.remove('dragging'); window.removeEventListener('mousemove', this.drag.bind(this)); window.removeEventListener('mouseup', this.stopDrag.bind(this)); }
+        }
+        
+        // --- MAGNETIC CURSOR CLASS ---
+        class MagneticCursor {
+            constructor() { this.cursor = document.querySelector('.cursor'); this.pos = {x:0, y:0}; this.targetPos = {x:0, y:0}; this.isMagnetic = false; this.init(); }
+            init() { window.addEventListener('mousemove', e => { this.targetPos = {x: e.clientX, y: e.clientY}; }); this.updateTargets(); requestAnimationFrame(this.update.bind(this)); }
+            updateTargets() { this.targets = [...document.querySelectorAll('.magnetic-target')]; this.targets.forEach(t => { t.addEventListener('mouseenter', () => this.startMagnet(t)); t.addEventListener('mouseleave', () => this.stopMagnet(t)); }); }
+            startMagnet(t) { this.isMagnetic = true; this.currentTarget = t; }
+            stopMagnet(t) { this.isMagnetic = false; t.style.transform = ''; }
+            update() {
+                this.pos.x += (this.targetPos.x - this.pos.x) * 0.15; this.pos.y += (this.targetPos.y - this.pos.y) * 0.15;
+                this.cursor.style.transform = `translate(${this.pos.x}px, ${this.pos.y}px)`;
+                this.cursor.classList.toggle('magnetic', this.isMagnetic);
+                if (this.isMagnetic && this.currentTarget) {
+                    const rect = this.currentTarget.getBoundingClientRect();
+                    const targetCenter = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+                    const pull = { x: (this.pos.x - targetCenter.x) * -0.3, y: (this.pos.y - targetCenter.y) * -0.3 };
+                    this.currentTarget.style.transform = `translate(${pull.x}px, ${pull.y}px)`;
+                }
+                requestAnimationFrame(this.update.bind(this));
+            }
+        }
+        
+        // --- MUSIC PLAYER CLASS ---
+        class MusicPlayer {
+            constructor() {
+                this.songs = [ { title: "Moran & Ocre", file: "music/Moran & Ocre.mp3" }, { title: "Ngoma ya Nywele", file: "music/Ngoma ya Nywele (Le tambour des cheveux).mp3" }, { title: "Nzoto Etumba", file: "music/Nzoto Etumba (La Rencontre)2 (Remastered) (Vocals).mp3" }, { title: "Suku Royal", file: "music/Suku Royal.mp3" } ];
+                this.currentSongIndex = 0; this.audio = new Audio(); this.isPlaying = false; this.init();
+            }
+            init() { this.audio.volume = 0.7; this.generatePlaylist(); this.loadSong(this.currentSongIndex); this.setupEventListeners(); document.getElementById('volumeSlider').value = this.audio.volume; }
+            setupEventListeners() {
+                document.getElementById('musicToggle').addEventListener('click', () => this.toggleMenu()); document.getElementById('playBtn').addEventListener('click', () => this.togglePlayPause());
+                document.getElementById('nextBtn').addEventListener('click', () => this.nextSong()); document.getElementById('prevBtn').addEventListener('click', () => this.prevSong());
+                document.getElementById('volumeSlider').addEventListener('input', (e) => this.setVolume(e.target.value));
+                this.audio.addEventListener('ended', () => this.nextSong()); this.audio.addEventListener('play', () => this.updatePlayUI(true)); this.audio.addEventListener('pause', () => this.updatePlayUI(false));
+            }
+            generatePlaylist() {
+                const playlistEl = document.getElementById('playlist'); playlistEl.innerHTML = '';
+                this.songs.forEach((song, index) => {
+                    const item = document.createElement('div'); item.className = 'song-item magnetic-target'; item.dataset.index = index;
+                    item.innerHTML = `<div class="song-title">${song.title}</div>`;
+                    item.addEventListener('click', () => { this.loadSong(index); this.play(); });
+                    playlistEl.appendChild(item);
+                });
+            }
+            loadSong(index) { this.currentSongIndex = (index + this.songs.length) % this.songs.length; this.audio.src = this.songs[this.currentSongIndex].file; this.updatePlaylistUI(); if (this.isPlaying) this.play(); }
+            play() { this.audio.play().catch(e => console.error("Erreur de lecture audio:", e)); }
+            pause() { this.audio.pause(); }
+            togglePlayPause() { this.isPlaying ? this.pause() : this.play(); }
+            nextSong() { this.loadSong(this.currentSongIndex + 1); }
+            prevSong() { this.loadSong(this.currentSongIndex - 1); }
+            setVolume(vol) { this.audio.volume = vol; }
+            toggleMenu() { document.getElementById('musicMenu').classList.toggle('collapsed'); magneticCursor.updateTargets(); }
+            updatePlayUI(isPlaying) { this.isPlaying = isPlaying; const playBtn = document.getElementById('playBtn'); playBtn.innerHTML = isPlaying ? '⏸️' : '▶️'; playBtn.classList.toggle('active', isPlaying); }
+            updatePlaylistUI() { document.querySelectorAll('.song-item').forEach(item => { item.classList.toggle('playing', parseInt(item.dataset.index) === this.currentSongIndex); }); }
+        }
+
+        // --- Init ---
+        let gallery, magneticCursor, musicPlayer, draggableMenu;
+        const mainContainer = document.getElementById('mainContainer');
+        const imageModal = document.getElementById('imageModal');
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            gallery = new InteractiveGallery('gallery-container');
+            magneticCursor = new MagneticCursor();
+            musicPlayer = new MusicPlayer();
+            const musicMenuElement = document.getElementById('musicMenu');
+            const musicMenuHandle = document.getElementById('musicMenuHandle');
+            draggableMenu = new Draggable(musicMenuElement, musicMenuHandle);
+
+            imageModal.addEventListener('click', (e) => {
+                if(e.target === imageModal) closeModal();
+            });
+            document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+        });
+
+        // --- MODAL FUNCTIONS ---
+        function openModal(src) {
+            if (imageModal.classList.contains('active')) return;
+            gallery.togglePause(true); 
+            mainContainer.classList.add('modal-open');
+            imageModal.classList.add('active');
+            document.getElementById('modalImage').src = src;
+        }
+        function closeModal() {
+            if (!imageModal.classList.contains('active')) return;
+            gallery.togglePause(false);
+            mainContainer.classList.remove('modal-open');
+            imageModal.classList.remove('active');
+        }
+    </script>
+</body>
+</html>

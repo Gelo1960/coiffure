@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galerie Interactive et Immersive - Projet Final</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Prata&family=Space+Grotesk:wght@300;400;500;700&display=swap');
+        :root { --accent-color: #ff4136; --music-accent: #1db954; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0a0a; height: 100vh; overflow: hidden; font-family: 'Space Grotesk', sans-serif; position: relative; cursor: none; }
+        .cursor { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 10000; mix-blend-mode: difference; }
+        .cursor-ring { width: 40px; height: 40px; border: 1px solid white; border-radius: 50%; transform: translate(-50%, -50%); transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, background-color 0.3s ease; backdrop-filter: invert(1) blur(1px); -webkit-backdrop-filter: invert(1) blur(1px); }
+        .cursor.magnetic .cursor-ring { width: 80px; height: 80px; background-color: rgba(255, 255, 255, 0.1); border-color: transparent; }
+
+        .container {
+            position: relative; width: 100%; height: 100%; overflow: hidden; perspective: 1500px;
+            transition: filter 0.5s ease, transform 0.5s ease;
+        }
+        .container.modal-open {
+            filter: blur(10px);
+            transform: scale(0.98);
+        }
+
+        .background-elements { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+
+        .story-text-overlay {
+            position: absolute;
+            z-index: 40;
+            color: white;
+            mix-blend-mode: difference;
+            will-change: transform, opacity;
+            text-align: center;
+            line-height: 1.1;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        /* Nouvelles animations de texte inspirées des tendances 2024-2025 */
+        .story-text-overlay.type-glitch {
+            animation: glitchEffect 8s ease-in-out;
+            text-shadow: 2px 0 #ff0040, -2px 0 #00ffff;
+        }
+
+        .story-text-overlay.type-typewriter {
+            animation: typewriterReveal 6s ease-out;
+            overflow: hidden;
+            border-right: 3px solid #fff;
+            white-space: nowrap;
+            margin: 0 auto;
+        }
+
+        .story-text-overlay.type-neon {
+            animation: neonGlow 8s ease-in-out;
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 15px #ff4136,
+                0 0 20px #ff4136,
+                0 0 35px #ff4136;
+        }
+
+        .story-text-overlay.type-wave {
+            animation: waveMotion 8s ease-in-out;
+            background: linear-gradient(45deg, #ff4136, #ffdc00, #ff4136);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% 200%;
+        }
+
+        .story-text-overlay.type-split {
+            animation: splitReveal 8s ease-in-out;
+            transform-origin: center;
+        }
+
+        .story-text-overlay.type-bubble {
+            animation: bubbleFloat 8s ease-in-out;
+            filter: blur(0px);
+        }
+
+        .story-text-overlay.type-matrix {
+            animation: matrixEffect 8s ease-in-out;
+            color: #00ff41;
+            text-shadow: 0 0 10px #00ff41;
+            font-family: 'Courier New', monospace;
+        }
+
+        .story-text-overlay.type-hologram {
+            animation: hologramShimmer 8s ease-in-out;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.8), transparent);
+            background-size: 200% 200%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .story-text-overlay.type-burn {
+            animation: burnEffect 8s ease-in-out;
+            background: linear-gradient(180deg, #ff4136 0%, #ff8c00 50%, #ffdc00 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .story-text-overlay.type-3d {
+            animation: rotate3D 8s ease-in-out;
+            transform-style: preserve-3d;
+            text-shadow: 
+                1px 1px 0 #ff4136,
+                2px 2px 0 #ff4136,
+                3px 3px 0 #ff4136,
+                4px 4px 0 #ff4136,
+                5px 5px 10px rgba(0,0,0,0.5);
+        }
+
+        /* Nouvelles animations supplémentaires inspirées des tendances 2024-2025 */
+        .story-text-overlay.type-liquid {
+            animation: liquidFlow 8s ease-in-out;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.5));
+        }
+
+        .story-text-overlay.type-kinetic {
+            animation: kineticMotion 8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+
+        .story-text-overlay.type-morphing {
+            animation: morphingText 8s ease-in-out;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24);
+            background-size: 400% 400%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .story-text-overlay.type-elastic {
+            animation: elasticBounce 8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-origin: center bottom;
+        }
+
+        .story-text-overlay.type-particle {
+            animation: particleExplode 8s ease-in-out;
+            filter: drop-shadow(0 0 10px #ff4757);
+        }
+
+        .story-text-overlay.type-cyber {
+            animation: cyberPunk 8s ease-in-out;
+            color: #00d4ff;
+            text-shadow: 
+                0 0 5px #00d4ff,
+                0 0 10px #00d4ff,
+                0 0 15px #00d4ff,
+                0 0 20px #ff0080;
+            font-family: 'Orbitron', 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        /* Keyframes pour toutes les nouvelles animations */
+        @keyframes glitchEffect {
+            0%, 100% { 
+                opacity: 0; 
+                transform: translateY(20px) scale(0.98);
+                text-shadow: 2px 0 #ff0040, -2px 0 #00ffff;
+            }
+            5% {
+                opacity: 1;
+                transform: translateY(0) scale(1) skew(-2deg);
+                text-shadow: 5px 0 #ff0040, -5px 0 #00ffff;
+            }
+            10% {
+                transform: translateY(0) scale(1) skew(1deg);
+                text-shadow: -2px 0 #ff0040, 2px 0 #00ffff;
+            }
+            15%, 85% { 
+                opacity: 1; 
+                transform: translateY(0) scale(1);
+                text-shadow: 2px 0 #ff0040, -2px 0 #00ffff;
+            }
+            90% {
+                transform: translateY(0) scale(1) skew(1deg);
+                text-shadow: 3px 0 #ff0040, -3px 0 #00ffff;
+            }
+        }
+
+        @keyframes typewriterReveal {
+            0% { 
+                opacity: 0;
+            width: 0;
+                transform: translateY(20px);
+            }
+            15% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            15%, 85% {
+            width: 100%;
+                border-right: 3px solid #fff;
+            }
+            90%, 100% {
+                opacity: 0;
+                transform: translateY(-20px);
+                border-right: none;
+            }
+        }
+
+        @keyframes neonGlow {
+            0%, 100% { 
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+                text-shadow: 
+                    0 0 5px #fff,
+                    0 0 10px #fff,
+                    0 0 15px #ff4136;
+            }
+            15%, 85% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                text-shadow: 
+                    0 0 5px #fff,
+                    0 0 10px #fff,
+                    0 0 15px #ff4136,
+                    0 0 20px #ff4136,
+                    0 0 35px #ff4136,
+                    0 0 40px #ff4136;
+            }
+            50% {
+                text-shadow: 
+                    0 0 2px #fff,
+                    0 0 5px #fff,
+                    0 0 8px #ff4136,
+                    0 0 12px #ff4136,
+                    0 0 20px #ff4136;
+            }
+        }
+
+        @keyframes waveMotion {
+            0%, 100% { 
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+                background-position: 0% 50%;
+            }
+            15%, 85% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        @keyframes splitReveal {
+            0%, 100% { 
+                opacity: 0;
+                transform: translateY(20px) scale(0.98) rotateX(90deg);
+            }
+            15%, 85% {
+                opacity: 1;
+                transform: translateY(0) scale(1) rotateX(0deg);
+            }
+            30% {
+                transform: translateY(0) scale(1.05) rotateX(-5deg);
+            }
+            45% {
+                transform: translateY(0) scale(1) rotateX(0deg);
+            }
+        }
+
+        @keyframes bubbleFloat {
+            0%, 100% { 
+            opacity: 0;
+                transform: translateY(20px) scale(0.98);
+                filter: blur(2px);
+        }
+            15%, 85% {
+            opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0px);
+            }
+            50% {
+                transform: translateY(-10px) scale(1.02);
+            }
+        }
+
+        @keyframes matrixEffect {
+            0%, 100% { 
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+                text-shadow: 0 0 10px #00ff41;
+            }
+            5% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                text-shadow: 0 0 20px #00ff41, 0 0 30px #00ff41;
+            }
+            15%, 85% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                text-shadow: 0 0 10px #00ff41;
+            }
+            25%, 75% {
+                text-shadow: 0 0 5px #00ff41;
+            }
+        }
+
+        @keyframes hologramShimmer {
+            0%, 100% { 
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+                background-position: -200% 0;
+            }
+            15%, 85% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                background-position: 200% 0;
+            }
+        }
+
+        @keyframes burnEffect {
+            0%, 100% { 
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+                filter: brightness(0.8);
+            }
+            15%, 85% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: brightness(1);
+            }
+            50% {
+                filter: brightness(1.5) saturate(1.3);
+            }
+        }
+
+        @keyframes rotate3D {
+            0%, 100% { 
+            opacity: 0;
+                transform: translateY(20px) scale(0.98) rotateY(90deg);
+            }
+            15%, 85% {
+                opacity: 1;
+                transform: translateY(0) scale(1) rotateY(0deg);
+            }
+            50% {
+                transform: translateY(0) scale(1) rotateY(-5deg);
+            }
+        }
+
+        /* Animation par défaut améliorée */
+        @keyframes storyFade {
+            0%, 100% { 
+                opacity: 0; 
+                transform: translateY(20px) scale(0.98);
+            }
+            15%, 85% { 
+            opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Keyframes pour les nouvelles animations */
+        @keyframes liquidFlow {
+            0%, 100% { 
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+                filter: blur(3px) drop-shadow(0 0 10px rgba(102, 126, 234, 0.3));
+            }
+            15%, 85% {
+            opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0px) drop-shadow(0 0 15px rgba(102, 126, 234, 0.6));
+            }
+            50% {
+                transform: translateY(-5px) scale(1.02);
+                filter: blur(0px) drop-shadow(0 0 20px rgba(102, 126, 234, 0.8));
+            }
+        }
+
+        @keyframes kineticMotion {
+            0% { 
+                opacity: 0;
+                transform: translateX(-100px) translateY(20px) rotate(-15deg) scale(0.8);
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            }
+            15% {
+                opacity: 1;
+                transform: translateX(0) translateY(0) rotate(0deg) scale(1);
+                text-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
+            }
+            30% {
+                transform: translateX(10px) translateY(-5px) rotate(2deg) scale(1.05);
+            }
+            45%, 75% {
+                transform: translateX(0) translateY(0) rotate(0deg) scale(1);
+            }
+            85% {
+                opacity: 1;
+                transform: translateX(0) translateY(0) rotate(0deg) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(100px) translateY(-20px) rotate(15deg) scale(0.8);
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        @keyframes morphingText {
+            0%, 100% { 
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+                background-position: 0% 50%;
+            }
+            15%, 85% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            25% { background-position: 100% 50%; }
+            50% { background-position: 200% 50%; }
+            75% { background-position: 300% 50%; }
+        }
+
+        @keyframes elasticBounce {
+            0% { 
+            opacity: 0;
+                transform: translateY(50px) scale(0.3, 0.1);
+            }
+            15% {
+                opacity: 1;
+                transform: translateY(0) scale(1.2, 0.8);
+            }
+            25% {
+                transform: translateY(-10px) scale(0.9, 1.1);
+            }
+            35% {
+                transform: translateY(0) scale(1.05, 0.95);
+            }
+            45%, 75% {
+                transform: translateY(0) scale(1, 1);
+            }
+            85% {
+                transform: translateY(0) scale(1, 1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.3, 0.1);
+            }
+        }
+
+        @keyframes particleExplode {
+            0%, 100% { 
+            opacity: 0;
+                transform: translateY(20px) scale(0.98);
+                filter: blur(2px) drop-shadow(0 0 5px #ff4757);
+        }
+            10% {
+            opacity: 1;
+                transform: translateY(0) scale(1.1);
+                filter: blur(0px) drop-shadow(0 0 20px #ff4757);
+            }
+            15%, 85% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0px) drop-shadow(0 0 15px #ff4757);
+            }
+            50% {
+                filter: blur(0px) drop-shadow(0 0 25px #ff4757) drop-shadow(0 0 35px #ffa726);
+            }
+        }
+
+        @keyframes cyberPunk {
+            0%, 100% { 
+                opacity: 0;
+                transform: translateY(20px) scale(0.98) skewX(-5deg);
+                text-shadow: 
+                    0 0 5px #00d4ff,
+                    0 0 10px #00d4ff,
+                    0 0 15px #ff0080;
+            }
+            5% {
+                opacity: 1;
+                transform: translateY(0) scale(1) skewX(0deg);
+                text-shadow: 
+                    0 0 10px #00d4ff,
+                    0 0 20px #00d4ff,
+                    0 0 30px #00d4ff,
+                    0 0 40px #ff0080;
+            }
+            15%, 85% {
+                opacity: 1;
+                transform: translateY(0) scale(1) skewX(0deg);
+                text-shadow: 
+                    0 0 5px #00d4ff,
+                    0 0 15px #00d4ff,
+                    0 0 25px #ff0080;
+            }
+            25%, 75% {
+                text-shadow: 
+                    0 0 3px #00d4ff,
+                    0 0 8px #00d4ff,
+                    0 0 12px #ff0080;
+            }
+        }
+
+        .story-text-overlay.size-l {
+            font-family: 'Bodoni Moda', serif;
+            font-size: clamp(6rem, 12vw, 12rem);
+        }
+        .story-text-overlay.size-m {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            max-width: 80%;
+        }
+        .story-text-overlay.size-s {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            max-width: 60%;
+            line-height: 1.4;
+            text-transform: none;
+            font-weight: 400;
+        }
+        
+        #gallery-container { position: absolute; inset: 0; z-index: 5; }
+        .gallery-item { position: absolute; will-change: transform; transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1); }
+        .image-container { border-radius: 12px; overflow: hidden; box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5); background: #111; z-index: 10; cursor: pointer; }
+        .image-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+        .image-container:hover img { transform: scale(1.1); }
+        .artistic-quote {
+            z-index: 50;
+            color: #e0e0e0;
+            max-width: 500px;
+            line-height: 1.7;
+            font-family: 'Prata', serif;
+            font-size: 1.3rem;
+            text-shadow: 0 2px 15px rgba(0,0,0,0.7);
+            padding: 30px 30px 30px 40px;
+            background: rgba(18, 18, 18, 0.5);
+            border-left: 4px solid var(--accent-color);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .artistic-quote .quote-symbol {
+            font-size: 5rem;
+            color: var(--accent-color);
+            position: absolute;
+            top: -5px;
+            left: 10px;
+            opacity: 0.15;
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1;
+        }
+
+        .artistic-quote .quote-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .artistic-quote .quote-source {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            text-align: right;
+            margin-top: 20px;
+            font-style: italic;
+            color: #aaa;
+        }
+        
+        .controls { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 2100; display: flex; gap: 10px; background: rgba(18, 18, 18, 0.6); backdrop-filter: blur(15px); padding: 10px; border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .controls .control-btn { background: rgba(255, 255, 255, 0.1); border: none; border-radius: 10px; color: #ccc; padding: 10px 15px; font-size: 0.9rem; transition: all 0.3s ease; }
+        .controls .control-btn.active, .controls .control-btn:hover { color: white; background-color: var(--accent-color); }
+        
+        .pause-indicator { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 5rem; color: white; z-index: 2200; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; text-shadow: 0 0 20px black; }
+        .pause-indicator.visible { opacity: 1; }
+        
+        .music-menu { position: fixed; top: 50%; right: 25px; transform: translateY(-50%); z-index: 2000; background: rgba(18, 18, 18, 0.8); backdrop-filter: blur(25px); border-radius: 24px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5); transition: width 0.5s, height 0.5s, border-radius 0.5s, opacity 0.5s; width: 280px; }
+        .music-menu.dragging { cursor: grabbing; transition: none; }
+        .music-menu.collapsed { width: 64px; height: 64px; padding: 0; border-radius: 32px; display: flex; align-items: center; justify-content: center; }
+        .music-toggle { background: transparent; border: none; border-radius: 50%; width: 60px; height: 60px; color: white; font-size: 1.8rem; transition: all 0.4s ease; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; }
+        .music-menu.collapsed .music-toggle { margin: 0; }
+        .music-toggle:hover { transform: scale(1.1) rotate(15deg); color: var(--music-accent); }
+        .music-content { transition: all 0.4s ease; overflow: hidden; }
+        .music-menu.collapsed .music-content { opacity: 0; visibility: hidden; height: 0; }
+        .music-title { color: #fff; font-size: 0.9rem; font-weight: 500; margin-bottom: 15px; text-align: center; letter-spacing: 1px; text-transform: uppercase; cursor: grab; }
+        .music-title:active { cursor: grabbing; }
+        .music-controls { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; align-items: center; }
+        .music-controls .control-btn { background: rgba(255, 255, 255, 0.08); border: none; border-radius: 50%; color: #999; width: 40px; height: 40px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; }
+        .music-controls .control-btn:hover { background-color: rgba(255, 255, 255, 0.15); color: #fff; }
+        .music-controls .play-btn { width: 50px; height: 50px; font-size: 1.1rem; }
+        .music-controls .control-btn.active { color: white; background-color: var(--music-accent); }
+        .playlist { max-height: 150px; overflow-y: auto; padding-right: 5px; }
+        .playlist::-webkit-scrollbar { width: 4px; }
+        .playlist::-webkit-scrollbar-track { background: transparent; }
+        .playlist::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 2px; }
+        .song-item { border-radius: 8px; padding: 10px; margin-bottom: 5px; transition: background-color 0.3s ease; cursor: pointer; }
+        .song-item:hover { background: rgba(255, 255, 255, 0.05); }
+        .song-item.playing .song-title { color: var(--music-accent); }
+        .song-title { color: #ddd; font-size: 0.9rem; font-weight: 400; }
+        .volume-control { margin-top: 15px; }
+        .volume-slider { width: 100%; -webkit-appearance: none; appearance: none; height: 4px; background: rgba(255, 255, 255, 0.2); border-radius: 2px; outline: none; }
+        .volume-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; background: #fff; border-radius: 50%; }
+
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); 
+            backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 10001; 
+            opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0s 0.4s; 
+        }
+        .modal.active { opacity: 1; visibility: visible; transition: opacity 0.4s ease; }
+        .modal-content { position: relative; max-width: 90vw; max-height: 90vh; transform: scale(0.95); transition: transform 0.4s ease; }
+        .modal.active .modal-content { transform: scale(1); }
+        .modal-image { width: 100%; height: 100%; object-fit: contain; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+        .close-modal { position: absolute; top: -15px; right: -15px; background: rgba(0,0,0,0.5); border: 2px solid white; border-radius: 50%; width: 40px; height: 40px; color: white; font-size: 22px; transition: all 0.3s ease; cursor: pointer; }
+        .close-modal:hover { background: var(--accent-color); transform: rotate(90deg); border-color: var(--accent-color);}
+    </style>
+</head>
+<body>
+    <div class="cursor"><div class="cursor-ring"></div></div>
+    
+    <div class="container" id="mainContainer">
+        <div class="background-elements" id="background-elements-container"></div>
+        <div id="gallery-container"></div>
+        <div class="pause-indicator" id="pause-indicator">PAUSE</div>
+        
+        <div class="music-menu collapsed magnetic-target" id="musicMenu">
+            <button class="music-toggle magnetic-target" id="musicToggle">🎵</button>
+        <div class="music-content">
+                <div class="music-title" id="musicMenuHandle">Ambiance Sonore</div>
+            <div class="music-controls">
+                    <button class="control-btn magnetic-target" id="prevBtn">⏮️</button>
+                    <button class="control-btn play-btn magnetic-target" id="playBtn">▶️</button>
+                    <button class="control-btn magnetic-target" id="nextBtn">⏭️</button>
+            </div>
+                <div class="playlist" id="playlist"></div>
+            <div class="volume-control">
+                    <input type="range" class="volume-slider magnetic-target" id="volumeSlider" min="0" max="1" step="0.01" value="0.7">
+            </div>
+        </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn magnetic-target" id="pauseBtn">⏸️ Pause</button>
+            <button class="control-btn magnetic-target" onclick="gallery.reset()">🔄 Recommencer</button>
+        </div>
+    </div>
+
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <button class="close-modal magnetic-target" id="closeModalBtn">×</button>
+            <img class="modal-image" id="modalImage" src="" alt="">
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const storyElements = [
+            { size: 'l', text: "L'art capillaire Africain" },
+            { size: 's', text: "La richesse capillaire de l'Afrique pré-coloniale révèle des systèmes sophistiqués de communication sociale, d'expression spirituelle et d'identité culturelle." },
+            { size: 'm', text: "Un langage visuel forgé sur 5000 ans d'histoire" },
+            { size: 'l', text: "Afrique de l'Ouest" },
+            { size: 'm', text: "Chez les Yoruba, l'Irun Didi était un art complexe où chaque style portait une signification précise." },
+            { size: 's', text: "Le Sùkú, une couronne tressée vers le haut, était originellement réservé aux épouses des rois avant de symboliser la beauté et la jeunesse." },
+            { size: 'm', text: "Les peuples Fulani transportaient leur héritage familial dans cinq tresses ornées de perles et de pièces d'argent." },
+            { size: 'l', text: "Afrique Centrale" },
+            { size: 'm', text: "Les guerriers Maasaï portaient de longues tresses enduites d'ocre rouge, symbole de leur force." },
+            { size: 's', text: "L'Amasunzu rwandais, avec plus de 30 styles en croissant, indiquait le statut de guerrier ou la pureté d'une jeune femme." },
+            { size: 'l', text: "Symboles & Rituels" },
+            { size: 'm', text: "Les cheveux, considérés comme sacrés, étaient le pont entre le monde des humains et celui des esprits." },
+            { size: 's', text: "Les bronzes du Bénin du XVe siècle immortalisent encore aujourd'hui des coiffures royales d'une incroyable complexité." },
+            { size: 'l', text: "Renaissance Moderne" },
+            { size: 'm', text: "Le mouvement 'Natural Hair' est une réappropriation culturelle, un acte de résistance et de fierté." },
+            { size: 's', text: "Aujourd'hui, les plateformes numériques et les festivals internationaux célèbrent et préservent cet héritage inestimable." }
+        ];
+        
+        const images = [
+            { src: 'images-inspiration-coiffures-africain/048a68e7-6d68-441e-beaf-2df8fb072878.png', title: 'Élégance Azur' },
+            { src: 'images-inspiration-coiffures-africain/0559abc8-612a-4029-ab11-94fa7addae42.png', title: 'Tresses Royales' },
+            { src: 'images-inspiration-coiffures-africain/0ee7be81-0e68-4395-8d7d-ebc12cd5b34b.png', title: 'Silhouette Moderne' },
+            { src: 'images-inspiration-coiffures-africain/105fae53-5078-4219-b680-6e95b68fcbe5.png', title: 'Vibrations Colorées' },
+            { src: 'images-inspiration-coiffures-africain/12b22a5c-cf0e-4368-a301-dc00fbbba8e6.png', title: 'Coupe Structurée' },
+            { src: 'images-inspiration-coiffures-africain/133f5cfc-d3d6-4619-9128-13564a70d1a5.png', title: 'Boucles Libres' },
+            { src: 'images-inspiration-coiffures-africain/193d6ddb-56c2-4428-9419-46eb026535ed.png', title: 'Cascade de Tresses' },
+            { src: 'images-inspiration-coiffures-africain/1adaf727-ef73-4c82-9848-7b69bdfe13a5.png', title: 'Éclat Festif' },
+            { src: 'images-inspiration-coiffures-africain/213f9864-1021-4291-87d0-711c60d926ca.png', title: 'Charisme Professionnel' },
+            { src: 'images-inspiration-coiffures-africain/233b357d-0350-4174-b320-cf729e7da468.png', title: 'Grâce Naturelle' },
+            { src: 'images-inspiration-coiffures-africain/2e5b5d56-07cf-4bd4-b8b8-11d8bc7cc9bf.png', title: 'Sophistication Urbaine' },
+            { src: 'images-inspiration-coiffures-africain/337046c4-031d-42bc-9a09-49b18b8853ee.png', title: 'Style Afro-Futuriste' },
+            { src: 'images-inspiration-coiffures-africain/374bd60c-c35d-4396-b19c-746657c252a1.png', title: 'Beauté Intemporelle' },
+            { src: 'images-inspiration-coiffures-africain/3e5a2bb4-1e9f-4579-95d0-a08f4daae8c3.png', title: 'Créativité Sans Limites' },
+            { src: 'images-inspiration-coiffures-africain/3e5e22ce-f43f-4edf-8036-c1d24e12c6d2.png', title: 'Harmonie Dorée' },
+            { src: 'images-inspiration-coiffures-africain/50f6a168-715f-467f-9f52-ce08398d6cea.png', title: 'Expression Authentique' },
+            { src: 'images-inspiration-coiffures-africain/51b615f7-6a32-4bf3-b3c8-7b2598fe8ee9.png', title: 'Fierté Culturelle' },
+            { src: 'images-inspiration-coiffures-africain/54d49991-c607-4223-b549-fe8d08cc97fe.png', title: 'Élégance Contemporaine' },
+            { src: 'images-inspiration-coiffures-africain/56905e4d-4496-4241-8c1e-18ebd9876195.png', title: 'Art Capillaire Moderne' },
+            { src: 'images-inspiration-coiffures-africain/5f7fd6b4-1531-41ee-aa27-20d0dedae753.png', title: 'Beauté Sculpturale' },
+            { src: 'images-inspiration-coiffures-africain/66041364-62c8-415a-9c35-dab10345c28d.png', title: 'Innovation Traditionnelle' },
+            { src: 'images-inspiration-coiffures-africain/664a4222-b9ed-41f6-93b3-51c373203c6a.png', title: 'Splendeur Naturelle' },
+            { src: 'images-inspiration-coiffures-africain/6684df14-bf64-4e1a-b422-2dbdec5b7c03.png', title: 'Géométrie Vivante' },
+            { src: 'images-inspiration-coiffures-africain/6cbf57d2-a298-478f-a892-a157807dc8e4.png', title: 'Texture Divine' },
+            { src: 'images-inspiration-coiffures-africain/71810122-7844-47c1-aa8c-1e7186ed075f.png', title: 'Majesté Africaine' },
+            { src: 'images-inspiration-coiffures-africain/71a775f1-db13-4d19-8aff-ddb8f45e18f7.png', title: 'Couronne Naturelle' },
+            { src: 'images-inspiration-coiffures-africain/75e863cd-ab70-42bb-a4e0-addc0bfa3e6f.png', title: 'Force Féminine' },
+            { src: 'images-inspiration-coiffures-africain/775d11be-f907-403f-a6a9-d2348da8ad36.png', title: 'Héritage Ancestral' },
+            { src: 'images-inspiration-coiffures-africain/7ce8e36d-a4c8-4076-a498-3bf89c0ef98d.png', title: 'Poésie Capillaire' },
+            { src: 'images-inspiration-coiffures-africain/7dafe693-b94b-4876-b850-46b74f907f7d.png', title: 'Sagesse Ancestrale' },
+            { src: 'images-inspiration-coiffures-africain/7e9d423b-948e-49a3-b6e6-c3edec7cfc19.png', title: 'Art de Vivre' },
+            { src: 'images-inspiration-coiffures-africain/8d4920dd-a2cf-445a-bf73-a1a22f20c978.png', title: 'Renaissance Culturelle' },
+            { src: 'images-inspiration-coiffures-africain/8f814cb6-ed98-4f21-af15-d63d565e8db3.png', title: 'Modernité Enracinée' },
+            { src: 'images-inspiration-coiffures-africain/9240b764-b37e-418b-8526-0ac3524082a6.png', title: 'Créativité Débordante' },
+            { src: 'images-inspiration-coiffures-africain/9497ead6-5e9a-45d8-84ab-6f1694276f02.png', title: 'Splendeur Tressée' },
+            { src: 'images-inspiration-coiffures-africain/98807c75-8e19-45b3-95f4-5ffd1dcc6940.png', title: 'Élégance Naturelle' },
+            { src: 'images-inspiration-coiffures-africain/9a01a209-bd03-4fcc-9801-bbfb57c549a8.png', title: 'Beauté Authentique' },
+            { src: 'images-inspiration-coiffures-africain/a1548b68-4652-4815-9169-133f2fe53610.png', title: 'Grâce Contemporaine' },
+            { src: 'images-inspiration-coiffures-africain/a9359946-d2ef-4443-a269-144e4eec4235.png', title: 'Magnificence Africaine' },
+            { src: 'images-inspiration-coiffures-africain/af49d2ae-96cc-466a-bc4a-68ccc9091322.png', title: 'Style Iconique' },
+            { src: 'images-inspiration-coiffures-africain/b5b8baf0-56d9-46a1-a7bb-6fec91984111.png', title: 'Diversité Capillaire' },
+            { src: 'images-inspiration-coiffures-africain/b6ee79eb-58e7-4fbb-bccb-e373ba24084a.png', title: 'Expression Personnelle' },
+            { src: 'images-inspiration-coiffures-africain/bb72d7d2-8079-446c-b824-996d09223f7c.png', title: 'Artisanat Traditionnel' },
+            { src: 'images-inspiration-coiffures-africain/bd5c34ba-f73a-4d87-8366-04271e204b1b.png', title: 'Beauté Sculpturale' },
+            { src: 'images-inspiration-coiffures-africain/c49ef9e9-1e9a-4b88-a8f3-d69a9070165c.png', title: 'Finesse Technique' },
+            { src: 'images-inspiration-coiffures-africain/c8241bf9-43b7-4e91-98b1-66c3229b1c10.png', title: 'Élégance Minimaliste' },
+            { src: 'images-inspiration-coiffures-africain/c9dc96e1-25e2-4eab-b8c2-7a42816034d8.png', title: 'Raffinement Naturel' },
+            { src: 'images-inspiration-coiffures-africain/cac1daf7-115c-45c4-82cf-fce0cc0ac1ad.png', title: 'Harmonie Parfaite' },
+            { src: 'images-inspiration-coiffures-africain/cb1f055a-b3ed-459e-b572-1ff97b7b10df.png', title: 'Créativité Infinie' },
+            { src: 'images-inspiration-coiffures-africain/d011c66c-cab0-4d58-9cc0-04d09453e0b6.png', title: 'Style Avant-gardiste' },
+            { src: 'images-inspiration-coiffures-africain/d0896f68-7113-4b7d-9dac-45c2863844a8.png', title: 'Beauté Indomptable' },
+            { src: 'images-inspiration-coiffures-africain/d37ce9df-6761-43dc-892d-cfb21308c1cd.png', title: 'Sophistication Pure' },
+            { src: 'images-inspiration-coiffures-africain/d7d6906e-ae27-4ef6-becb-95fc00e37cf1.png', title: 'Charme Irrésistible' },
+            { src: 'images-inspiration-coiffures-africain/d8cd9691-ad65-48dc-a903-8497d2612c20.png', title: 'Élégance Urbaine' },
+            { src: 'images-inspiration-coiffures-africain/e72c0550-8324-4cc0-9f3a-38caf6f4862c.png', title: 'Luminosité Dorée' },
+            { src: 'images-inspiration-coiffures-africain/e9974373-243f-468b-93d0-bb8436021b6f.png', title: 'Grâce Divine' },
+            { src: 'images-inspiration-coiffures-africain/f10e668f-8c42-464d-9cec-3f5b5436f779.png', title: 'Art Vivant' },
+            { src: 'images-inspiration-coiffures-africain/f2e0d5f7-2bcf-4d0d-a24c-24cc4fb3dedc.png', title: 'Splendeur Moderne' },
+            { src: 'images-inspiration-coiffures-africain/fb72dfba-3ddb-4d5d-9598-e80357b63ad3.png', title: 'Magnificence Éternelle' }
+        ];
+        
+        // --- INTERACTIVE GALLERY CLASS ---
+        class InteractiveGallery {
+            constructor(containerId) {
+                this.container = document.getElementById(containerId);
+                this.bgContainer = document.getElementById('background-elements-container');
+                this.items = [];
+                this.scroll = { current: 0, target: 0, velocity: 0, baseVelocity: -0.15, friction: 0.96, isPaused: false };
+                this.virtualHeight = 0;
+                this.hugeTextTimer = null;
+                this.init();
+            }
+
+            init() { this.populate(); this.addEventListeners(); this.startHugeTextCycle(); this.update(); }
+            
+            populate() {
+                this.container.innerHTML = '';
+                this.items = [];
+                
+                // --- intelligent mixing of content ---
+                const allContent = [];
+                const imagesCopy = [...images];
+                const textsCopy = [...storyElements];
+                const imagesPerText = Math.floor(imagesCopy.length / (textsCopy.length || 1));
+
+                while (imagesCopy.length > 0) {
+                    for (let i = 0; i < imagesPerText && imagesCopy.length > 0; i++) {
+                        allContent.push(imagesCopy.shift());
+                    }
+                    if (textsCopy.length > 0) {
+                        allContent.push(textsCopy.shift());
+                    }
+                }
+                allContent.push(...textsCopy); // Add any remaining texts
+
+                let currentY = 0;
+
+                const lanes = [ { xRange: [0.05, 0.25] }, { xRange: [0.38, 0.58] }, { xRange: [0.70, 0.90] } ];
+                let lastLaneIndex = -1;
+
+                for(let i = 0; i < 120; i++) {
+                    const content = allContent[i % allContent.length];
+                    const el = document.createElement('div');
+                    el.className = 'gallery-item';
+                    
+                    let laneIndex;
+                    do { laneIndex = Math.floor(Math.random() * lanes.length); } while(laneIndex === lastLaneIndex);
+                    lastLaneIndex = laneIndex;
+                    const lane = lanes[laneIndex];
+
+                    if (content.src) {
+                        const sizes = [{w:300, h:220}, {w:380, h:280}, {w:450, h:340}, {w:280, h:400}, {w:360, h:320}, {w:400, h:300}];
+                        const size = sizes[Math.floor(Math.random() * sizes.length)];
+                        el.innerHTML = `<div class="image-container magnetic-target" style="width:${size.w}px; height:${size.h}px;"><img src="${content.src}" loading="lazy" /></div>`;
+                        el.querySelector('.image-container').addEventListener('click', (e) => { e.stopPropagation(); openModal(content.src); });
+                        
+                        const x = (lane.xRange[0] + Math.random() * (lane.xRange[1] - lane.xRange[0])) * window.innerWidth - size.w / 2;
+                        const itemData = { el, y: currentY, x, rotation: (Math.random() - 0.5) * 8, height: size.h };
+                        this.items.push(itemData);
+                        currentY += size.h + 250;
+                    } else {
+                        el.innerHTML = `
+                            <div class="story-text-overlay size-${content.size} type-${content.type}">${content.text}</div>`;
+                        const quoteWidth = 500;
+                        const x = (window.innerWidth - quoteWidth) / 2 + (Math.random() - 0.5) * 200;
+                        const itemData = { el, y: currentY, x, rotation: (Math.random() - 0.5) * 2, height: 250 };
+                        this.items.push(itemData);
+                        currentY += 250 + 450;
+                    }
+                    this.container.appendChild(el);
+                }
+                this.virtualHeight = currentY;
+            }
+
+            addEventListeners() {
+                window.addEventListener('wheel', e => { if (!this.scroll.isPaused) { this.scroll.velocity += e.deltaY * 0.04; } });
+                document.getElementById('pauseBtn').addEventListener('click', () => this.togglePause());
+                window.addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); this.togglePause(); } });
+            }
+            
+            togglePause(forceState = null) {
+                this.scroll.isPaused = forceState !== null ? forceState : !this.scroll.isPaused;
+                document.getElementById('pauseBtn').classList.toggle('active', this.scroll.isPaused);
+                document.getElementById('pauseBtn').textContent = this.scroll.isPaused ? '▶️ Reprendre' : '⏸️ Pause';
+                document.getElementById('pause-indicator').classList.toggle('visible', this.scroll.isPaused);
+            }
+
+            update() {
+                if (!this.scroll.isPaused) {
+                    this.scroll.target += this.scroll.velocity;
+                    this.scroll.target += this.scroll.baseVelocity;
+                    this.scroll.velocity *= this.scroll.friction;
+                }
+                this.scroll.current += (this.scroll.target - this.scroll.current) * 0.08; 
+                for (const item of this.items) {
+                    const screenPos = (item.y - this.scroll.current) % this.virtualHeight;
+                    let y = screenPos;
+                    if(screenPos < -item.height) y = screenPos + this.virtualHeight;
+                    else if (screenPos > window.innerHeight) y = screenPos - this.virtualHeight;
+                    item.el.style.transform = `translate3d(${item.x}px, ${y}px, 0) rotateZ(${item.rotation}deg)`;
+                }
+                requestAnimationFrame(this.update.bind(this));
+            }
+
+            startHugeTextCycle() {
+                let currentIndex = 0;
+
+                const displayStory = () => {
+                    if (document.querySelector('.story-text-overlay')) {
+                        // Un élément est déjà affiché, on attend qu'il disparaisse
+                        setTimeout(displayStory, 1000);
+                        return;
+                    }
+                    
+                    const story = storyElements[currentIndex];
+                    const el = document.createElement('div');
+                    el.className = `story-text-overlay size-${story.size} type-${story.type}`;
+                    el.textContent = story.text;
+
+                    // Positionnement aléatoire
+                    el.style.top = `${15 + Math.random() * 40}%`;
+                    el.style.left = '50%';
+                    el.style.transform = 'translateX(-50%)';
+
+                    this.bgContainer.appendChild(el);
+
+                    setTimeout(() => {
+                        el.remove();
+                        // Passe à l'élément suivant et prépare le prochain cycle
+                        currentIndex = (currentIndex + 1) % storyElements.length;
+                        setTimeout(displayStory, 500); // Délai avant d'afficher le suivant
+                    }, 8000); // La durée de l'animation
+                };
+
+                displayStory();
+            }
+            
+            reset() { this.scroll.target = 0; this.scroll.velocity = 0; this.populate(); magneticCursor.updateTargets(); clearInterval(this.hugeTextTimer); this.startHugeTextCycle(); }
+        }
+
+        // --- DRAGGABLE CLASS ---
+        class Draggable {
+            constructor(element, handle) {
+                this.element = element; this.handle = handle || element; this.isDragging = false; this.offsetX = 0; this.offsetY = 0; this.init();
+            }
+            init() { this.handle.addEventListener('mousedown', this.startDrag.bind(this)); }
+            startDrag(e) {
+                e.preventDefault(); this.isDragging = true; this.element.classList.add('dragging');
+                this.offsetX = e.clientX - this.element.offsetLeft; this.offsetY = e.clientY - this.element.offsetTop;
+                if (this.element.style.right) { this.element.style.left = `${this.element.offsetLeft}px`; this.element.style.top = `${this.element.offsetTop}px`; this.element.style.right = ''; this.element.style.transform = ''; }
+                window.addEventListener('mousemove', this.drag.bind(this)); window.addEventListener('mouseup', this.stopDrag.bind(this));
+            }
+            drag(e) {
+                if (!this.isDragging) return;
+                let newX = e.clientX - this.offsetX; let newY = e.clientY - this.offsetY;
+                newX = Math.max(0, Math.min(newX, window.innerWidth - this.element.offsetWidth));
+                newY = Math.max(0, Math.min(newY, window.innerHeight - this.element.offsetHeight));
+                this.element.style.left = `${newX}px`; this.element.style.top = `${newY}px`;
+            }
+            stopDrag() { this.isDragging = false; this.element.classList.remove('dragging'); window.removeEventListener('mousemove', this.drag.bind(this)); window.removeEventListener('mouseup', this.stopDrag.bind(this)); }
+        }
+        
+        // --- MAGNETIC CURSOR CLASS ---
+        class MagneticCursor {
+            constructor() { this.cursor = document.querySelector('.cursor'); this.pos = {x:0, y:0}; this.targetPos = {x:0, y:0}; this.isMagnetic = false; this.init(); }
+            init() { window.addEventListener('mousemove', e => { this.targetPos = {x: e.clientX, y: e.clientY}; }); this.updateTargets(); requestAnimationFrame(this.update.bind(this)); }
+            updateTargets() { this.targets = [...document.querySelectorAll('.magnetic-target')]; this.targets.forEach(t => { t.addEventListener('mouseenter', () => this.startMagnet(t)); t.addEventListener('mouseleave', () => this.stopMagnet(t)); }); }
+            startMagnet(t) { this.isMagnetic = true; this.currentTarget = t; }
+            stopMagnet(t) { this.isMagnetic = false; t.style.transform = ''; }
+            update() {
+                this.pos.x += (this.targetPos.x - this.pos.x) * 0.15; this.pos.y += (this.targetPos.y - this.pos.y) * 0.15;
+                this.cursor.style.transform = `translate(${this.pos.x}px, ${this.pos.y}px)`;
+                this.cursor.classList.toggle('magnetic', this.isMagnetic);
+                if (this.isMagnetic && this.currentTarget) {
+                    const rect = this.currentTarget.getBoundingClientRect();
+                    const targetCenter = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+                    const pull = { x: (this.pos.x - targetCenter.x) * -0.3, y: (this.pos.y - targetCenter.y) * -0.3 };
+                    this.currentTarget.style.transform = `translate(${pull.x}px, ${pull.y}px)`;
+                }
+                requestAnimationFrame(this.update.bind(this));
+            }
+        }
+        
+        // --- MUSIC PLAYER CLASS ---
+        class MusicPlayer {
+            constructor() {
+                this.songs = [ { title: "Moran & Ocre", file: "music/Moran & Ocre.mp3" }, { title: "Ngoma ya Nywele", file: "music/Ngoma ya Nywele (Le tambour des cheveux).mp3" }, { title: "Nzoto Etumba", file: "music/Nzoto Etumba (La Rencontre)2 (Remastered) (Vocals).mp3" }, { title: "Suku Royal", file: "music/Suku Royal.mp3" } ];
+                this.currentSongIndex = 0; this.audio = new Audio(); this.isPlaying = false; this.init();
+            }
+            init() { this.audio.volume = 0.7; this.generatePlaylist(); this.loadSong(this.currentSongIndex); this.setupEventListeners(); document.getElementById('volumeSlider').value = this.audio.volume; }
+            setupEventListeners() {
+                document.getElementById('musicToggle').addEventListener('click', () => this.toggleMenu()); document.getElementById('playBtn').addEventListener('click', () => this.togglePlayPause());
+                document.getElementById('nextBtn').addEventListener('click', () => this.nextSong()); document.getElementById('prevBtn').addEventListener('click', () => this.prevSong());
+                document.getElementById('volumeSlider').addEventListener('input', (e) => this.setVolume(e.target.value));
+                this.audio.addEventListener('ended', () => this.nextSong()); this.audio.addEventListener('play', () => this.updatePlayUI(true)); this.audio.addEventListener('pause', () => this.updatePlayUI(false));
+            }
+            generatePlaylist() {
+                const playlistEl = document.getElementById('playlist'); playlistEl.innerHTML = '';
+                this.songs.forEach((song, index) => {
+                    const item = document.createElement('div'); item.className = 'song-item magnetic-target'; item.dataset.index = index;
+                    item.innerHTML = `<div class="song-title">${song.title}</div>`;
+                    item.addEventListener('click', () => { this.loadSong(index); this.play(); });
+                    playlistEl.appendChild(item);
+                });
+            }
+            loadSong(index) { this.currentSongIndex = (index + this.songs.length) % this.songs.length; this.audio.src = this.songs[this.currentSongIndex].file; this.updatePlaylistUI(); if (this.isPlaying) this.play(); }
+            play() { this.audio.play().catch(e => console.error("Erreur de lecture audio:", e)); }
+            pause() { this.audio.pause(); }
+            togglePlayPause() { this.isPlaying ? this.pause() : this.play(); }
+            nextSong() { this.loadSong(this.currentSongIndex + 1); }
+            prevSong() { this.loadSong(this.currentSongIndex - 1); }
+            setVolume(vol) { this.audio.volume = vol; }
+            toggleMenu() { document.getElementById('musicMenu').classList.toggle('collapsed'); magneticCursor.updateTargets(); }
+            updatePlayUI(isPlaying) { this.isPlaying = isPlaying; const playBtn = document.getElementById('playBtn'); playBtn.innerHTML = isPlaying ? '⏸️' : '▶️'; playBtn.classList.toggle('active', isPlaying); }
+            updatePlaylistUI() { document.querySelectorAll('.song-item').forEach(item => { item.classList.toggle('playing', parseInt(item.dataset.index) === this.currentSongIndex); }); }
+        }
+
+        // --- Init ---
+        let gallery, magneticCursor, musicPlayer, draggableMenu;
+        const mainContainer = document.getElementById('mainContainer');
+        const imageModal = document.getElementById('imageModal');
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            gallery = new InteractiveGallery('gallery-container');
+            magneticCursor = new MagneticCursor();
+            musicPlayer = new MusicPlayer();
+            const musicMenuElement = document.getElementById('musicMenu');
+            const musicMenuHandle = document.getElementById('musicMenuHandle');
+            draggableMenu = new Draggable(musicMenuElement, musicMenuHandle);
+
+            imageModal.addEventListener('click', (e) => {
+                if(e.target === imageModal) closeModal();
+            });
+            document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+        });
+
+        // --- MODAL FUNCTIONS ---
+        function openModal(src) {
+            if (imageModal.classList.contains('active')) return;
+            gallery.togglePause(true); 
+            mainContainer.classList.add('modal-open');
+            imageModal.classList.add('active');
+            document.getElementById('modalImage').src = src;
+        }
+        function closeModal() {
+            if (!imageModal.classList.contains('active')) return;
+            gallery.togglePause(false);
+            mainContainer.classList.remove('modal-open');
+            imageModal.classList.remove('active');
+        }
+
+        function showNextStory() {
+            if (storyIndex >= allStoryCards.length) {
+                setTimeout(() => {
+                    // Redémarrer avec de nouvelles animations aléatoires
+                    createStoryElements();
+                    showNextStory();
+                }, 2000);
+                return;
+            }
+
+            const storyElements = document.querySelectorAll('.story-card');
+            const currentElement = storyElements[storyIndex];
+            
+            if (currentElement) {
+                const textOverlay = currentElement.querySelector('.story-text-overlay');
+                
+                // Appliquer l'animation selon le type
+                if (textOverlay.classList.contains('type-typewriter')) {
+                    textOverlay.style.animation = 'typewriterReveal 6s ease-out forwards';
+                } else if (textOverlay.classList.contains('type-glitch')) {
+                    textOverlay.style.animation = 'glitchEffect 8s ease-in-out forwards';
+                } else if (textOverlay.classList.contains('type-neon')) {
+                    textOverlay.style.animation = 'neonGlow 8s ease-in-out forwards';
+                } else if (textOverlay.classList.contains('type-wave')) {
+                    textOverlay.style.animation = 'waveMotion 8s ease-in-out forwards';
+                } else if (textOverlay.classList.contains('type-split')) {
+                    textOverlay.style.animation = 'splitReveal 8s ease-in-out forwards';
+                } else if (textOverlay.classList.contains('type-bubble')) {
+                    textOverlay.style.animation = 'bubbleFloat 8s ease-in-out forwards';
+                } else if (textOverlay.classList.contains('type-matrix')) {
+                    textOverlay.style.animation = 'matrixEffect 8s ease-in-out forwards';
+                } else if (textOverlay.classList.contains('type-hologram')) {
+                    textOverlay.style.animation = 'hologramShimmer 8s ease-in-out forwards';
+                } else if (textOverlay.classList.contains('type-burn')) {
+                    textOverlay.style.animation = 'burnEffect 8s ease-in-out forwards';
+                } else if (textOverlay.classList.contains('type-3d')) {
+                    textOverlay.style.animation = 'rotate3D 8s ease-in-out forwards';
+                } else if (textOverlay.classList.contains('type-liquid')) {
+                    textOverlay.style.animation = 'liquidFlow 8s ease-in-out forwards';
+                } else if (textOverlay.classList.contains('type-kinetic')) {
+                    textOverlay.style.animation = 'kineticMotion 8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards';
+                } else if (textOverlay.classList.contains('type-morphing')) {
+                    textOverlay.style.animation = 'morphingText 8s ease-in-out forwards';
+                } else if (textOverlay.classList.contains('type-elastic')) {
+                    textOverlay.style.animation = 'elasticBounce 8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards';
+                } else if (textOverlay.classList.contains('type-particle')) {
+                    textOverlay.style.animation = 'particleExplode 8s ease-in-out forwards';
+                } else if (textOverlay.classList.contains('type-cyber')) {
+                    textOverlay.style.animation = 'cyberPunk 8s ease-in-out forwards';
+                } else {
+                    // Animation par défaut améliorée
+                    textOverlay.style.animation = 'storyFade 8s ease-in-out forwards';
+                }
+                
+                console.log(`Showing story ${storyIndex + 1} with animation type:`, textOverlay.className);
+            }
+
+            storyIndex++;
+            
+            // Programmer la prochaine histoire avec un délai variable selon l'animation
+            const delay = getAnimationDelay(currentElement?.querySelector('.story-text-overlay'));
+            setTimeout(showNextStory, delay);
+        }
+
+        function getAnimationDelay(textOverlay) {
+            if (!textOverlay) return 8000;
+            
+            if (textOverlay.classList.contains('type-typewriter') || 
+                textOverlay.classList.contains('type-glitch') ||
+                textOverlay.classList.contains('type-kinetic') ||
+                textOverlay.classList.contains('type-elastic')) {
+                return 6500; // Plus rapide pour les effets dynamiques
+            } else if (textOverlay.classList.contains('type-matrix') || 
+                      textOverlay.classList.contains('type-hologram') ||
+                      textOverlay.classList.contains('type-cyber') ||
+                      textOverlay.classList.contains('type-morphing')) {
+                return 9000; // Plus lent pour les effets complexes
+            } else if (textOverlay.classList.contains('type-liquid') ||
+                      textOverlay.classList.contains('type-particle')) {
+                return 8500; // Timing intermédiaire pour les effets fluides
+            } else {
+                return 8000; // Délai standard
+            }
+        }
+
+        function createStoryElements() {
+            storyContainer.innerHTML = '';
+            storyIndex = 0;
+
+            const animationTypes = [
+                'type-glitch', 'type-typewriter', 'type-neon', 'type-wave', 
+                'type-split', 'type-bubble', 'type-matrix', 'type-hologram', 
+                'type-burn', 'type-3d', 'type-liquid', 'type-kinetic',
+                'type-morphing', 'type-elastic', 'type-particle', 'type-cyber'
+            ];
+
+            allStoryCards.forEach((card, index) => {
+                const storyElement = document.createElement('div');
+                storyElement.className = 'story-card';
+                
+                // Application d'un type d'animation aléatoire avec distribution équilibrée
+                const randomAnimationType = animationTypes[Math.floor(Math.random() * animationTypes.length)];
+                
+                storyElement.innerHTML = `
+                    <div class="story-text-overlay size-${card.size} ${randomAnimationType}" 
+                         style="opacity: 0; left: ${card.position.x}%; top: ${card.position.y}%;">
+                        ${card.text}
+                    </div>
+                `;
+                
+                storyContainer.appendChild(storyElement);
+            });
+
+            console.log(`Story elements created with ${animationTypes.length} varied animation types`);
+        }
+    </script>
+</body>
+</html>

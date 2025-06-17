@@ -1,0 +1,2083 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galerie Flottante Améliorée - Inspirations Coiffures</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+            position: relative;
+            cursor: none;
+            perspective: 1000px;
+        }
+
+        /* Parallax Background Layers */
+        .parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 120%;
+            height: 120%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .parallax-layer-1 {
+            background: radial-gradient(circle at 20% 30%, rgba(255, 85, 60, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 70%, rgba(60, 85, 255, 0.12) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(255, 20, 147, 0.08) 0%, transparent 50%);
+            animation: parallaxFloat1 20s ease-in-out infinite;
+        }
+
+        .parallax-layer-2 {
+            background: radial-gradient(circle at 60% 20%, rgba(29, 185, 84, 0.1) 0%, transparent 60%),
+                        radial-gradient(circle at 30% 60%, rgba(138, 43, 226, 0.08) 0%, transparent 50%);
+            animation: parallaxFloat2 25s ease-in-out infinite reverse;
+        }
+
+        @keyframes parallaxFloat1 {
+            0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
+            33% { transform: translate3d(-20px, -30px, 0) rotate(1deg) scale(1.05); }
+            66% { transform: translate3d(30px, -20px, 0) rotate(-0.5deg) scale(0.98); }
+        }
+
+        @keyframes parallaxFloat2 {
+            0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
+            50% { transform: translate3d(-40px, 25px, 0) rotate(-1deg) scale(1.03); }
+        }
+
+        /* Curseur personnalisé */
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.1s ease;
+            mix-blend-mode: difference;
+        }
+
+        /* Grain noise overlay amélioré */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(255, 85, 60, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(60, 85, 255, 0.05) 0%, transparent 50%),
+                url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMScgaGVpZ2h0PScxJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxmaWx0ZXIgaWQ9J24nPjxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249JzAuMicgLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0nMScgaGVpZ2h0PScxJyBmaWx0ZXI9InVybCgjbikiIGZpbGw9JyNmZmYnIC8+PC9zdmc+");
+            opacity: 0.08;
+            z-index: 1;
+            animation: backgroundShift 30s ease-in-out infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(1deg); }
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            padding: 25px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .header:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(135deg, #ffffff 0%, #ff5540 50%, #ffffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleGlow 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { filter: drop-shadow(0 0 10px rgba(255, 85, 64, 0.3)); }
+            100% { filter: drop-shadow(0 0 25px rgba(255, 85, 64, 0.6)); }
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        /* Menu Musical - Design Moderne Ultra-Sophistiqué */
+        .music-menu {
+            position: fixed;
+            top: 50vh;
+            right: 20px;
+            transform: translateY(-50%);
+            z-index: 2000;
+            background: linear-gradient(145deg, 
+                rgba(10, 10, 15, 0.98) 0%,
+                rgba(20, 15, 25, 0.95) 30%,
+                rgba(15, 20, 30, 0.97) 70%,
+                rgba(8, 8, 12, 0.98) 100%);
+            backdrop-filter: blur(50px) saturate(200%) brightness(1.1) contrast(1.1);
+            -webkit-backdrop-filter: blur(50px) saturate(200%) brightness(1.1) contrast(1.1);
+            border-radius: 28px;
+            padding: 28px;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            box-shadow: 
+                0 40px 80px rgba(0, 0, 0, 0.6),
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 8px 32px rgba(29, 185, 84, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.12),
+                inset 0 2px 0 rgba(255, 255, 255, 0.18),
+                inset 0 -2px 0 rgba(0, 0, 0, 0.25),
+                inset 0 0 60px rgba(255, 255, 255, 0.03);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            max-width: 320px;
+            min-width: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .music-menu::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(29, 185, 84, 0.08) 0%,
+                rgba(138, 43, 226, 0.06) 25%,
+                rgba(255, 20, 147, 0.08) 50%,
+                rgba(0, 191, 255, 0.06) 75%,
+                rgba(29, 185, 84, 0.08) 100%);
+            background-size: 400% 400%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            animation: gradientFlow 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .music-menu:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes gradientFlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .music-menu.collapsed {
+            width: 72px;
+            padding: 18px;
+            border-radius: 36px;
+        }
+
+        .music-toggle {
+            background: linear-gradient(135deg, 
+                #1db954 0%, 
+                #1ed760 25%, 
+                #ff1493 50%, 
+                #8a2be2 75%, 
+                #1db954 100%);
+            background-size: 300% 300%;
+            border: none;
+            border-radius: 50%;
+            width: 64px;
+            height: 64px;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            box-shadow: 
+                0 12px 30px rgba(29, 185, 84, 0.4),
+                0 6px 15px rgba(29, 185, 84, 0.3),
+                inset 0 2px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            animation: buttonGradient 6s ease-in-out infinite;
+        }
+
+        @keyframes buttonGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .music-toggle::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.3), transparent 70%);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            transform: scale(0);
+        }
+
+        .music-toggle:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 
+                0 18px 40px rgba(29, 185, 84, 0.6),
+                0 8px 20px rgba(29, 185, 84, 0.4),
+                0 0 0 4px rgba(255, 255, 255, 0.1);
+        }
+
+        .music-toggle:hover::before {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .music-content {
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+        }
+
+        .music-menu.collapsed .music-content {
+            opacity: 0;
+            visibility: hidden;
+            height: 0;
+            overflow: hidden;
+            transform: scale(0.8);
+        }
+
+        .music-title {
+            color: #ffffff;
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 24px;
+            text-align: center;
+            background: linear-gradient(135deg, 
+                #ffffff 0%, 
+                #1db954 25%, 
+                #ff1493 50%, 
+                #8a2be2 75%, 
+                #ffffff 100%);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleGradient 5s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(29, 185, 84, 0.3);
+            position: relative;
+        }
+
+        @keyframes titleGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Visualiseur Audio Moderne */
+        .audio-visualizer {
+            display: flex;
+            justify-content: center;
+            align-items: end;
+            gap: 4px;
+            height: 50px;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .audio-visualizer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(29, 185, 84, 0.1), 
+                rgba(255, 20, 147, 0.1),
+                transparent);
+            transition: left 1s ease;
+        }
+
+        .audio-visualizer:hover::before {
+            left: 100%;
+        }
+
+        .visualizer-bar {
+            width: 5px;
+            background: linear-gradient(to top, 
+                #1db954 0%, 
+                #1ed760 30%, 
+                #ff1493 60%, 
+                #8a2be2 100%);
+            border-radius: 3px;
+            animation: visualize 1s ease-in-out infinite alternate;
+            box-shadow: 0 0 10px rgba(29, 185, 84, 0.5);
+        }
+
+        .visualizer-bar:nth-child(1) { animation-delay: 0s; }
+        .visualizer-bar:nth-child(2) { animation-delay: 0.1s; }
+        .visualizer-bar:nth-child(3) { animation-delay: 0.2s; }
+        .visualizer-bar:nth-child(4) { animation-delay: 0.3s; }
+        .visualizer-bar:nth-child(5) { animation-delay: 0.4s; }
+        .visualizer-bar:nth-child(6) { animation-delay: 0.5s; }
+        .visualizer-bar:nth-child(7) { animation-delay: 0.6s; }
+        .visualizer-bar:nth-child(8) { animation-delay: 0.7s; }
+        .visualizer-bar:nth-child(9) { animation-delay: 0.8s; }
+        .visualizer-bar:nth-child(10) { animation-delay: 0.9s; }
+
+        @keyframes visualize {
+            0% { height: 8px; opacity: 0.6; }
+            100% { height: 35px; opacity: 1; }
+        }
+
+        .music-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 24px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .music-controls::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(29, 185, 84, 0.1), 
+                rgba(255, 20, 147, 0.08),
+                transparent);
+            transition: left 0.8s ease;
+        }
+
+        .music-controls:hover::before {
+            left: 100%;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            color: #b3b3b3;
+            width: 52px;
+            height: 52px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(15px);
+        }
+
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: linear-gradient(135deg, 
+                #1db954, 
+                #1ed760, 
+                #ff1493);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.4s ease;
+            z-index: -1;
+        }
+
+        .control-btn:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+
+        .control-btn:hover {
+            color: white;
+            transform: scale(1.15) rotate(5deg);
+            box-shadow: 
+                0 10px 30px rgba(29, 185, 84, 0.4),
+                0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .control-btn.active {
+            background: linear-gradient(135deg, 
+                #1db954, 
+                #1ed760, 
+                #ff1493);
+            color: white;
+            box-shadow: 
+                0 8px 25px rgba(29, 185, 84, 0.5),
+                0 0 0 2px rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .playlist {
+            max-height: 350px;
+            overflow-y: auto;
+            padding-right: 6px;
+            margin-bottom: 20px;
+        }
+
+        .playlist::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .playlist::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .playlist::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, 
+                #1db954, 
+                #1ed760, 
+                #ff1493);
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .playlist::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, 
+                #1ed760, 
+                #ff1493, 
+                #8a2be2);
+            transform: scale(1.1);
+        }
+
+        .song-item {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+        }
+
+        .song-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(29, 185, 84, 0.15), 
+                rgba(255, 20, 147, 0.1),
+                rgba(138, 43, 226, 0.1),
+                transparent);
+            transition: left 0.6s ease;
+        }
+
+        .song-item:hover::before {
+            left: 100%;
+        }
+
+        .song-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateX(10px) scale(1.03);
+            box-shadow: 
+                0 12px 30px rgba(29, 185, 84, 0.3),
+                0 6px 15px rgba(255, 20, 147, 0.2),
+                0 0 0 2px rgba(255, 255, 255, 0.1);
+            border-color: rgba(29, 185, 84, 0.5);
+        }
+
+        .song-item.playing {
+            background: linear-gradient(135deg, 
+                rgba(29, 185, 84, 0.2), 
+                rgba(255, 20, 147, 0.15),
+                rgba(138, 43, 226, 0.1));
+            border-color: rgba(29, 185, 84, 0.6);
+            box-shadow: 
+                0 12px 30px rgba(29, 185, 84, 0.4),
+                0 6px 15px rgba(255, 20, 147, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transform: scale(1.02);
+        }
+
+        .song-item.playing::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 5px;
+            background: linear-gradient(135deg, 
+                #1db954, 
+                #1ed760, 
+                #ff1493);
+            border-radius: 0 3px 3px 0;
+            box-shadow: 0 0 15px rgba(29, 185, 84, 0.6);
+        }
+
+        .song-title {
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .song-duration {
+            color: #b3b3b3;
+            font-size: 0.9rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        .volume-control {
+            margin-top: 24px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .volume-control::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(29, 185, 84, 0.05), 
+                rgba(255, 20, 147, 0.03),
+                rgba(138, 43, 226, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .volume-control:hover::before {
+            opacity: 1;
+        }
+
+        .volume-label {
+            color: #ffffff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, 
+                #ffffff, 
+                #1db954, 
+                #ff1493);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .volume-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .volume-slider::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: var(--volume, 50%);
+            background: linear-gradient(135deg, 
+                #1db954, 
+                #1ed760, 
+                #ff1493);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, 
+                #1db954, 
+                #1ed760, 
+                #ff1493);
+            cursor: pointer;
+            box-shadow: 
+                0 6px 18px rgba(29, 185, 84, 0.4),
+                0 3px 9px rgba(255, 20, 147, 0.3),
+                0 0 0 3px rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .volume-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 
+                0 8px 24px rgba(29, 185, 84, 0.6),
+                0 4px 12px rgba(255, 20, 147, 0.4),
+                0 0 0 4px rgba(255, 255, 255, 0.2);
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, 
+                #1db954, 
+                #1ed760, 
+                #ff1493);
+            cursor: pointer;
+            border: none;
+            box-shadow: 
+                0 6px 18px rgba(29, 185, 84, 0.4),
+                0 3px 9px rgba(255, 20, 147, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .music-menu {
+                right: 10px;
+                max-width: 280px;
+                min-width: 260px;
+                padding: 20px;
+            }
+            
+            .music-menu.collapsed {
+                width: 64px;
+                padding: 16px;
+            }
+            
+            .music-toggle {
+                width: 56px;
+                height: 56px;
+                font-size: 1.6rem;
+            }
+            
+            .music-controls {
+                gap: 12px;
+                padding: 16px;
+            }
+            
+            .control-btn {
+                width: 48px;
+                height: 48px;
+                font-size: 1.1rem;
+            }
+
+            .audio-visualizer {
+                height: 40px;
+                padding: 12px;
+            }
+
+            .visualizer-bar {
+                width: 4px;
+            }
+
+            .song-item {
+                padding: 15px;
+            }
+
+            .volume-control {
+                padding: 16px;
+            }
+        }
+
+        .floating-gallery {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        .image-container {
+            position: absolute;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            opacity: 0.85;
+            filter: grayscale(40%) brightness(0.8) blur(0.5px);
+            box-shadow: 
+                0 15px 35px rgba(0, 0, 0, 0.3),
+                0 5px 15px rgba(0, 0, 0, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(15px) saturate(120%);
+            -webkit-backdrop-filter: blur(15px) saturate(120%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+            transform-style: preserve-3d;
+            will-change: transform, filter, opacity;
+            position: relative;
+        }
+
+        /* Parallax Effect for Images */
+        .image-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, 
+                rgba(255, 85, 60, 0.1) 0%,
+                transparent 25%,
+                rgba(60, 85, 255, 0.08) 50%,
+                transparent 75%,
+                rgba(255, 20, 147, 0.1) 100%);
+            opacity: 0;
+            transition: all 0.6s ease;
+            transform: rotate(0deg);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .image-container::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.1) 0%,
+                transparent 50%,
+                rgba(0, 0, 0, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .image-container.size-small {
+            width: 260px;
+            height: 180px;
+        }
+        
+        .image-container.size-medium {
+            width: 320px;
+            height: 240px;
+        }
+        
+        .image-container.size-large {
+            width: 400px;
+            height: 300px;
+        }
+        
+        .image-container.size-portrait {
+            width: 240px;
+            height: 360px;
+        }
+
+        .image-container:hover {
+            transform: scale(1.08) rotateY(5deg) rotateX(2deg) translateZ(50px);
+            filter: grayscale(0%) brightness(1.1) blur(0px);
+            box-shadow: 
+                0 0 30px rgba(255, 85, 60, 0.6),
+                0 30px 60px rgba(0, 0, 0, 0.6),
+                0 15px 30px rgba(255, 20, 147, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            opacity: 1;
+            border-color: rgba(255, 85, 60, 0.5);
+            animation-play-state: paused;
+        }
+
+        .image-container:hover::before {
+            opacity: 1;
+            transform: rotate(180deg) scale(1.2);
+        }
+
+        .image-container:hover::after {
+            opacity: 1;
+        }
+
+        /* Micro-interactions pour les images */
+        .image-container:active {
+            transform: scale(1.02) rotateY(2deg) rotateX(1deg) translateZ(20px);
+            transition: all 0.1s ease;
+        }
+
+        .image-container.paused {
+            animation-play-state: paused !important;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+            border-radius: 15px;
+        }
+
+        .image-container:hover img {
+            transform: scale(1.15);
+        }
+
+        .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+            color: white;
+            padding: 20px 16px 16px;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .image-container:hover .image-overlay {
+            transform: translateY(0);
+        }
+
+        .image-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #ffffff;
+        }
+
+        .image-description {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            line-height: 1.4;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            padding: 15px 25px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .control-btn:hover::before {
+            left: 100%;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 85, 60, 0.3);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 85, 60, 0.4);
+            border-color: rgba(255, 85, 60, 0.5);
+        }
+
+        .control-btn.active {
+            background: linear-gradient(135deg, rgba(255, 85, 60, 0.6), rgba(255, 85, 60, 0.8));
+            box-shadow: 0 8px 25px rgba(255, 85, 60, 0.4);
+            border-color: rgba(255, 85, 60, 0.7);
+        }
+
+        /* Animations améliorées */
+        @keyframes moveUpSlow {
+            0%   { transform: translateY(120vh) scale(0.8) rotateZ(var(--rotate)); opacity: 0; }
+            5%   { opacity: 0.6; }
+            95%  { opacity: 0.6; }
+            100% { transform: translateY(-130vh) scale(0.8) rotateZ(var(--rotate)); opacity: 0; }
+        }
+
+        @keyframes moveUpFast {
+            0%   { transform: translateY(120vh) scale(0.9) rotateZ(var(--rotate)); opacity: 0; }
+            3%   { opacity: 0.8; }
+            97%  { opacity: 0.8; }
+            100% { transform: translateY(-130vh) scale(0.9) rotateZ(var(--rotate)); opacity: 0; }
+        }
+
+        @keyframes moveUpNormal {
+            0%   { transform: translateY(120vh) scale(0.85) rotateZ(var(--rotate)); opacity: 0; }
+            4%   { opacity: 0.7; }
+            96%  { opacity: 0.7; }
+            100% { transform: translateY(-130vh) scale(0.85) rotateZ(var(--rotate)); opacity: 0; }
+        }
+
+        /* Textes flottants intégrés */
+        .floating-text {
+            position: absolute;
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0;
+            will-change: transform, opacity;
+            text-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 15px 25px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        .floating-text.hero {
+            font-size: 1.4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+            line-height: 1.1;
+            padding: 20px 35px;
+            max-width: 500px;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .floating-text.quote {
+            font-size: 1.2rem;
+            font-style: italic;
+            font-weight: 300;
+            color: #FFD700;
+            font-family: 'Playfair Display', serif;
+            line-height: 1.3;
+            max-width: 450px;
+            text-align: left;
+            border-left: 4px solid #FFD700;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .floating-text.fact {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: #E8E8E8;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(165, 216, 255, 0.3);
+            max-width: 480px;
+            line-height: 1.4;
+        }
+
+        .floating-text.region {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #FF6B35;
+            background: rgba(255, 107, 53, 0.1);
+            border: 2px solid #FF6B35;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 0 0 30px rgba(255, 212, 59, 0.6);
+        }
+
+        .floating-text.inspiration {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #FFD700;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            line-height: 1.4;
+            max-width: 300px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .floating-text.culture {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: #FFA500;
+            background: rgba(255, 165, 0, 0.15);
+            border: 2px solid #FFA500;
+            font-style: italic;
+            max-width: 460px;
+        }
+
+        /* Animations pour les textes flottants */
+        @keyframes floatTextUp {
+            0% { transform: translateY(120vh) scale(0.8) rotateZ(var(--text-rotate)); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-120vh) scale(0.8) rotateZ(var(--text-rotate)); opacity: 0; }
+        }
+
+        @keyframes floatTextDiagonal {
+            0% { transform: translate(120vw, 120vh) scale(0.9) rotateZ(var(--text-rotate)); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translate(-120vw, -120vh) scale(0.9) rotateZ(var(--text-rotate)); opacity: 0; }
+        }
+
+        @keyframes floatTextSide {
+            0% { transform: translateX(120vw) scale(0.85) rotateZ(var(--text-rotate)); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateX(-120vw) scale(0.85) rotateZ(var(--text-rotate)); opacity: 0; }
+        }
+
+        /* Modal amélioré */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+            transform: scale(0.8) rotateY(10deg);
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1) rotateY(0deg);
+        }
+
+        .modal-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 20px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 59, 48, 0.8);
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        /* Responsive amélioré */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .header p {
+                font-size: 0.9rem;
+            }
+            
+            .story-line.hero {
+                font-size: 2.5rem;
+            }
+            
+            .story-line.quote {
+                font-size: 1.8rem;
+            }
+            
+            .story-line.region {
+                font-size: 2.2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+                bottom: 20px;
+                padding: 12px 20px;
+            }
+            
+            .control-btn {
+                padding: 10px 16px;
+                font-size: 0.8rem;
+            }
+            
+            .floating-text {
+                max-width: 280px;
+                padding: 10px 15px;
+                font-size: 0.9em !important;
+            }
+            
+            .floating-text.hero {
+                font-size: 1.1em !important;
+                max-width: 320px;
+            }
+            
+            .floating-text.quote {
+                font-size: 1em !important;
+                max-width: 300px;
+            }
+            
+            .floating-text.fact {
+                font-size: 0.9em !important;
+                max-width: 290px;
+            }
+            
+            .floating-text.region {
+                font-size: 1em !important;
+                letter-spacing: 0.5px;
+            }
+            
+            .floating-text.inspiration {
+                font-size: 0.95em !important;
+                max-width: 280px;
+            }
+            
+            .floating-text.culture {
+                font-size: 0.9em !important;
+                max-width: 290px;
+            }
+        }
+
+        /* Préférences de mouvement réduit */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="custom-cursor"></div>
+    
+    <!-- Parallax Background Layers -->
+    <div class="parallax-bg parallax-layer-1"></div>
+    <div class="parallax-bg parallax-layer-2"></div>
+    
+    <!-- Les textes flottants seront générés dynamiquement avec les images -->
+    
+    <!-- Menu Musical -->
+    <div class="music-menu collapsed" id="musicMenu">
+        <button class="music-toggle" id="musicToggle">🎵</button>
+        <div class="music-content">
+            <div class="music-title">Ambiance Musicale</div>
+            <div class="music-controls">
+                <button class="control-btn" id="playBtn">▶️</button>
+                <button class="control-btn" id="pauseBtn">⏸️</button>
+                <button class="control-btn" id="stopBtn">⏹️</button>
+                <button class="control-btn" id="shuffleBtn">🔀</button>
+            </div>
+            <div class="playlist" id="playlist">
+                <!-- Les chansons seront ajoutées dynamiquement -->
+            </div>
+            <div class="volume-control">
+                <div class="volume-label">Volume</div>
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70">
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <h1>✨ Galerie Flottante Améliorée</h1>
+            <p>Inspirations Coiffures Afro - Expérience Interactive Premium</p>
+        </header>
+
+        <div class="floating-gallery" id="gallery">
+            <!-- Les images seront générées par JavaScript -->
+        </div>
+
+        <div class="controls">
+            <button class="control-btn active" onclick="setAnimationSpeed('fast')">🚀 Accélérer</button>
+            <button class="control-btn" onclick="setAnimationSpeed('normal')">⏱ Normal</button>
+            <button class="control-btn" onclick="setAnimationSpeed('slow')">🐌 Ralentir</button>
+            <button class="control-btn" onclick="resetGallery()">🔄 Recommencer</button>
+        </div>
+    </div>
+
+    <!-- Modal pour zoom -->
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <img class="modal-image" id="modalImage" src="" alt="">
+        </div>
+    </div>
+
+    <script>
+        // Configuration des textes flottants
+        const floatingTexts = [
+            { text: "La richesse capillaire de l'Afrique pré-coloniale révèle des systèmes sophistiqués de communication sociale, d'expression spirituelle et d'identité culturelle qui transcendent la simple esthétique.", type: "hero", animation: "floatTextUp" },
+            { text: "Ces traditions millénaires, développées sur plus de 5 000 ans d'histoire, servaient de langages visuels complexes communiquant le statut social, l'âge, l'appartenance ethnique, les croyances spirituelles et les rôles communautaires.", type: "fact", animation: "floatTextDiagonal" },
+            { text: "Loin d'être de simples parures, ces coiffures constituaient des marqueurs identitaires essentiels qui structuraient les sociétés africaines et facilitaient la cohésion sociale.", type: "culture", animation: "floatTextSide" },
+            { text: "L'Afrique de l'Ouest présente certaines des traditions capillaires les plus sophistiquées du continent, particulièrement chez les peuples yoruba du Nigeria.", type: "region", animation: "floatTextUp" },
+            { text: "Le système 'Irun Didi' (cheveux tressés à la main) constituait un art complexe où chaque style portait une signification précise. Les Yoruba avaient développé plus de 50 styles distincts.", type: "fact", animation: "floatTextDiagonal" },
+            { text: "Le Sùkú/Shuku, style emblématique en forme de couronne tressée vers le haut, était originellement réservé aux épouses de rois (Oba) avant d'être démocratisé.", type: "quote", animation: "floatTextSide" },
+            { text: "Les peuples Fulani développèrent un système distinctif de cinq tresses ornées de perles de corail, coquillages cauris, ambre et pièces d'argent familiales servant de symboles patrimoniaux.", type: "region", animation: "floatTextUp" },
+            { text: "Les Maasaï du Kenya et de Tanzanie développèrent des traditions capillaires étroitement liées à leur système d'âge masculin.", type: "culture", animation: "floatTextDiagonal" },
+            { text: "Les guerriers (moran) portaient de longs cheveux tressés finement, stylisés avec des mélanges d'ocre rouge et de graisse animale, symbolisant leur force.", type: "inspiration", animation: "floatTextSide" },
+            { text: "L'Amasunzu rwandais représente l'une des traditions les plus documentées avec plus de 30 variations de styles en forme de croissant.", type: "fact", animation: "floatTextUp" },
+             { text: "Les peuples zulu développèrent les nœuds bantu (Izimpande), sections de cheveux tordues et enroulées en spirales, originellement portées par les femmes de la classe dirigeante.", type: "region", animation: "floatTextDiagonal" },
+             { text: "Les coiffures africaines traditionnelles fonctionnaient comme des systèmes de communication visuelle sophistiqués.", type: "quote", animation: "floatTextSide" },
+             { text: "Le statut matrimonial s'exprimait par des changements dramatiques de coiffure selon les étapes de la vie.", type: "culture", animation: "floatTextUp" },
+             { text: "Les cheveux étaient considérés comme la partie la plus élevée du corps, facilitant la communication divine.", type: "inspiration", animation: "floatTextDiagonal" },
+             { text: "Les bronzes du Bénin (XVe-XVIe siècles) préservent des représentations détaillées de coiffures royales avec des arrangements tressés complexes.", type: "fact", animation: "floatTextSide" },
+             { text: "Le système de tressage Irun Kiko yoruba utilisait des fils colorés pour envelopper des sections de cheveux, nécessitant 6 à 10 heures de travail communautaire.", type: "region", animation: "floatTextUp" },
+             { text: "Le beurre de karité constituait l'agent hydratant universel, préparé selon des processus traditionnels produisant un beurre pur aux propriétés anti-inflammatoires.", type: "culture", animation: "floatTextDiagonal" },
+             { text: "Les peignes Ilari/Ilarun yoruba, sculptés dans une seule pièce de bois ou d'os, portaient souvent des symboles culturels décoratifs.", type: "quote", animation: "floatTextSide" },
+             { text: "Le système maître-apprenti nécessitait 2 à 5 ans de formation intensive, progressant graduellement des styles simples aux créations complexes.", type: "fact", animation: "floatTextUp" },
+             { text: "La colonisation européenne supprima systématiquement les traditions capillaires, mais les mouvements contemporains embrassent ces héritages comme moyens de réclamation identitaire.", type: "inspiration", animation: "floatTextDiagonal" },
+             { text: "Cette documentation révèle que les coiffures africaines traditionnelles représentaient des systèmes de communication sophistiqués dépassant largement les choix esthétiques simples.", type: "hero", animation: "floatTextSide" }
+        ];
+
+        // Configuration des images
+        const images = [
+            { src: 'images-inspiration-coiffures-africain/048a68e7-6d68-441e-beaf-2df8fb072878.png', title: 'Style Afro Naturel', description: 'Coiffure naturelle élégante' },
+            { src: 'images-inspiration-coiffures-africain/0559abc8-612a-4029-ab11-94fa7addae42.png', title: 'Tresses Sophistiquées', description: 'Tressage moderne et stylé' },
+            { src: 'images-inspiration-coiffures-africain/0ee7be81-0e68-4395-8d7d-ebc12cd5b34b.png', title: 'Look Moderne', description: 'Style contemporain' },
+            { src: 'images-inspiration-coiffures-africain/105fae53-5078-4219-b680-6e95b68fcbe5.png', title: 'Style Coloré', description: 'Coiffure avec touches de couleur' },
+            { src: 'images-inspiration-coiffures-africain/12b22a5c-cf0e-4368-a301-dc00fbbba8e6.png', title: 'Coupe Courte', description: 'Style court et dynamique' },
+            { src: 'images-inspiration-coiffures-africain/133f5cfc-d3d6-4619-9128-13564a70d1a5.png', title: 'Boucles Naturelles', description: 'Texture naturelle mise en valeur' },
+            { src: 'images-inspiration-coiffures-africain/193d6ddb-56c2-4428-9419-46eb026535ed.png', title: 'Tresses Longues', description: 'Tressage élaboré et long' },
+            { src: 'images-inspiration-coiffures-africain/1adaf727-ef73-4c82-9848-7b69bdfe13a5.png', title: 'Style Festif', description: 'Coiffure pour occasions spéciales' },
+            { src: 'images-inspiration-coiffures-africain/213f9864-1021-4291-87d0-711c60d926ca.png', title: 'Look Professionnel', description: 'Style adapté au travail' },
+            { src: 'images-inspiration-coiffures-africain/233b357d-0350-4174-b320-cf729e7da468.png', title: 'Style Décontracté', description: 'Look casual et confortable' },
+            { src: 'images-inspiration-coiffures-africain/2e5b5d56-07cf-4bd4-b8b8-11d8bc7cc9bf.png', title: 'Tresses Créatives', description: 'Motifs de tressage artistiques' },
+            { src: 'images-inspiration-coiffures-africain/337046c4-031d-42bc-9a09-49b18b8853ee.png', title: 'Style Volumineux', description: 'Coiffure avec volume naturel' },
+            { src: 'images-inspiration-coiffures-africain/374bd60c-c35d-4396-b19c-746657c252a1.png', title: 'Look Glamour', description: 'Style élégant et raffiné' },
+            { src: 'images-inspiration-coiffures-africain/3e5a2bb4-1e9f-4579-95d0-a08f4daae8c3.png', title: 'Coiffure Protectrice', description: 'Style qui protège les cheveux' },
+            { src: 'images-inspiration-coiffures-africain/3e5e22ce-f43f-4edf-8036-c1d24e12c6d2.png', title: 'Tresses Géométriques', description: 'Motifs géométriques modernes' },
+            { src: 'images-inspiration-coiffures-africain/50f6a168-715f-467f-9f52-ce08398d6cea.png', title: 'Style Bohème', description: 'Look libre et naturel' },
+            { src: 'images-inspiration-coiffures-africain/51b615f7-6a32-4bf3-b3c8-7b2598fe8ee9.png', title: 'Coiffure Structurée', description: 'Style bien défini et organisé' },
+            { src: 'images-inspiration-coiffures-africain/54d49991-c607-4223-b549-fe8d08cc97fe.png', title: 'Look Vintage', description: 'Style rétro revisité' },
+            { src: 'images-inspiration-coiffures-africain/56905e4d-4496-4241-8c1e-18ebd9876195.png', title: 'Tresses Complexes', description: 'Tressage élaboré et détaillé' },
+            { src: 'images-inspiration-coiffures-africain/5f7fd6b4-1531-41ee-aa27-20d0dedae753.png', title: 'Style Minimaliste', description: 'Simplicité et élégance' },
+            { src: 'images-inspiration-coiffures-africain/66041364-62c8-415a-9c35-dab10345c28d.png', title: 'Coiffure Asymétrique', description: 'Style moderne et audacieux' },
+            { src: 'images-inspiration-coiffures-africain/664a4222-b9ed-41f6-93b3-51c373203c6a.png', title: 'Look Texturé', description: 'Jeu de textures naturelles' },
+            { src: 'images-inspiration-coiffures-africain/6684df14-bf64-4e1a-b422-2dbdec5b7c03.png', title: 'Style Urbain', description: 'Coiffure moderne de ville' },
+            { src: 'images-inspiration-coiffures-africain/6cbf57d2-a298-478f-a892-a157807dc8e4.png', title: 'Tresses Artistiques', description: 'Création capillaire unique' },
+            { src: 'images-inspiration-coiffures-africain/71810122-7844-47c1-aa8c-1e7186ed075f.png', title: 'Look Sophistiqué', description: 'Raffinement et classe' },
+            { src: 'images-inspiration-coiffures-africain/71a775f1-db13-4d19-8aff-ddb8f45e18f7.png', title: 'Style Dynamique', description: 'Mouvement et énergie' },
+            { src: 'images-inspiration-coiffures-africain/75e863cd-ab70-42bb-a4e0-addc0bfa3e6f.png', title: 'Coiffure Traditionnelle', description: 'Héritage culturel moderne' },
+            { src: 'images-inspiration-coiffures-africain/775d11be-f907-403f-a6a9-d2348da8ad36.png', title: 'Look Contemporain', description: 'Style actuel et tendance' },
+            { src: 'images-inspiration-coiffures-africain/7ce8e36d-a4c8-4076-a498-3bf89c0ef98d.png', title: 'Tresses Fluides', description: 'Mouvement naturel et gracieux' },
+            { src: 'images-inspiration-coiffures-africain/7dafe693-b94b-4876-b850-46b74f907f7d.png', title: 'Style Expressif', description: 'Personnalité affirmée' },
+            { src: 'images-inspiration-coiffures-africain/7e9d423b-948e-49a3-b6e6-c3edec7cfc19.png', title: 'Coiffure Innovante', description: 'Créativité et originalité' },
+            { src: 'images-inspiration-coiffures-africain/8d4920dd-a2cf-445a-bf73-a1a22f20c978.png', title: 'Look Harmonieux', description: 'Équilibre et beauté' },
+            { src: 'images-inspiration-coiffures-africain/8f814cb6-ed98-4f21-af15-d63d565e8db3.png', title: 'Style Audacieux', description: 'Originalité et caractère' },
+            { src: 'images-inspiration-coiffures-africain/9240b764-b37e-418b-8526-0ac3524082a6.png', title: 'Tresses Délicates', description: 'Finesse et précision' },
+            { src: 'images-inspiration-coiffures-africain/9497ead6-5e9a-45d8-84ab-6f1694276f02.png', title: 'Coiffure Sculpturale', description: 'Art capillaire en 3D' },
+            { src: 'images-inspiration-coiffures-africain/98807c75-8e19-45b3-95f4-5ffd1dcc6940.png', title: 'Look Naturel Plus', description: 'Beauté naturelle sublimée' },
+            { src: 'images-inspiration-coiffures-africain/9a01a209-bd03-4fcc-9801-bbfb57c549a8.png', title: 'Style Polyvalent', description: 'Adaptable à toute occasion' },
+            { src: 'images-inspiration-coiffures-africain/a1548b68-4652-4815-9169-133f2fe53610.png', title: 'Tresses Modernes', description: 'Tradition revisitée' },
+            { src: 'images-inspiration-coiffures-africain/a9359946-d2ef-4443-a269-144e4eec4235.png', title: 'Coiffure Élégante', description: 'Grâce et distinction' },
+            { src: 'images-inspiration-coiffures-africain/af49d2ae-96cc-466a-bc4a-68ccc9091322.png', title: 'Look Unique', description: 'Style personnel et distinctif' },
+            { src: 'images-inspiration-coiffures-africain/b5b8baf0-56d9-46a1-a7bb-6fec91984111.png', title: 'Style Fluide', description: 'Mouvement et souplesse' },
+            { src: 'images-inspiration-coiffures-africain/b6ee79eb-58e7-4fbb-bccb-e373ba24084a.png', title: 'Coiffure Expressive', description: 'Communication par le style' },
+            { src: 'images-inspiration-coiffures-africain/bb72d7d2-8079-446c-b824-996d09223f7c.png', title: 'Tresses Royales', description: 'Majesté et noblesse' },
+            { src: 'images-inspiration-coiffures-africain/bd5c34ba-f73a-4d87-8366-04271e204b1b.png', title: 'Look Raffiné', description: 'Subtilité et finesse' },
+            { src: 'images-inspiration-coiffures-africain/c49ef9e9-1e9a-4b88-a8f3-d69a9070165c.png', title: 'Style Créatif', description: 'Innovation capillaire' },
+            { src: 'images-inspiration-coiffures-africain/c8241bf9-43b7-4e91-98b1-66c3229b1c10.png', title: 'Coiffure Harmonieuse', description: 'Équilibre parfait' },
+            { src: 'images-inspiration-coiffures-africain/c9dc96e1-25e2-4eab-b8c2-7a42816034d8.png', title: 'Tresses Artistiques', description: 'Œuvre d\'art capillaire' },
+            { src: 'images-inspiration-coiffures-africain/cac1daf7-115c-45c4-82cf-fce0cc0ac1ad.png', title: 'Look Moderne Chic', description: 'Tendance et sophistication' },
+            { src: 'images-inspiration-coiffures-africain/cb1f055a-b3ed-459e-b572-1ff97b7b10df.png', title: 'Style Authentique', description: 'Véritable expression de soi' },
+            { src: 'images-inspiration-coiffures-africain/d011c66c-cab0-4d58-9cc0-04d09453e0b6.png', title: 'Coiffure Distinctive', description: 'Caractère unique et fort' },
+            { src: 'images-inspiration-coiffures-africain/d0896f68-7113-4b7d-9dac-45c2863844a8.png', title: 'Tresses Précieuses', description: 'Valeur et beauté' },
+            { src: 'images-inspiration-coiffures-africain/d37ce9df-6761-43dc-892d-cfb21308c1cd.png', title: 'Look Inspirant', description: 'Source d\'inspiration' },
+            { src: 'images-inspiration-coiffures-africain/d7d6906e-ae27-4ef6-becb-95fc00e37cf1.png', title: 'Style Magnifique', description: 'Beauté éclatante' },
+            { src: 'images-inspiration-coiffures-africain/d8cd9691-ad65-48dc-a903-8497d2612c20.png', title: 'Coiffure Sublime', description: 'Perfection esthétique' },
+            { src: 'images-inspiration-coiffures-africain/e72c0550-8324-4cc0-9f3a-38caf6f4862c.png', title: 'Tresses Exceptionnelles', description: 'Qualité remarquable' },
+            { src: 'images-inspiration-coiffures-africain/e9974373-243f-468b-93d0-bb8436021b6f.png', title: 'Look Extraordinaire', description: 'Au-delà de l\'ordinaire' },
+            { src: 'images-inspiration-coiffures-africain/f10e668f-8c42-464d-9cec-3f5b5436f779.png', title: 'Style Merveilleux', description: 'Émerveillement garanti' },
+            { src: 'images-inspiration-coiffures-africain/f2e0d5f7-2bcf-4d0d-a24c-24cc4fb3dedc.png', title: 'Coiffure Splendide', description: 'Éclat et magnificence' },
+            { src: 'images-inspiration-coiffures-africain/fb72dfba-3ddb-4d5d-9598-e80357b63ad3.png', title: 'Tresses Finales', description: 'Apothéose de beauté' }
+        ];
+
+        let gallery = document.getElementById('gallery');
+        let currentSpeed = 'normal';
+        let animationIntervals = [];
+        let textIndex = 0;
+        let imageGroupCounter = 0;
+        
+        // Curseur personnalisé
+        const cursor = document.querySelector('.custom-cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Fonction pour créer un texte flottant
+        function createFloatingText() {
+            const textData = floatingTexts[textIndex % floatingTexts.length];
+            textIndex++;
+            
+            const textElement = document.createElement('div');
+            textElement.className = `floating-text ${textData.type}`;
+            textElement.innerHTML = textData.text;
+            
+            // Position aléatoire
+            const startX = Math.random() * window.innerWidth;
+            const startY = window.innerHeight + 100;
+            
+            textElement.style.left = startX + 'px';
+            textElement.style.top = startY + 'px';
+            
+            // Rotation aléatoire
+            const rotation = (Math.random() - 0.5) * 10;
+            textElement.style.setProperty('--text-rotate', rotation + 'deg');
+            
+            // Animation
+            const animationDuration = getAnimationDuration();
+            textElement.style.animation = `${textData.animation} ${animationDuration}s linear forwards`;
+            
+            gallery.appendChild(textElement);
+            
+            // Supprimer après animation
+            setTimeout(() => {
+                if (textElement.parentNode) {
+                    textElement.remove();
+                }
+            }, animationDuration * 1000);
+        }
+
+        // Gestion des animations d'images
+        function createFloatingImage(imageData, delay = 0) {
+            setTimeout(() => {
+                const container = document.createElement('div');
+                container.className = 'image-container';
+                
+                const sizes = ['size-small', 'size-medium', 'size-large', 'size-portrait'];
+                const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
+                container.classList.add(randomSize);
+                
+                const randomX = Math.random() * (window.innerWidth - 300);
+                const randomRotate = (Math.random() - 0.5) * 20;
+                
+                container.style.left = randomX + 'px';
+                container.style.setProperty('--rotate', randomRotate + 'deg');
+                
+                const animationDuration = getAnimationDuration();
+                container.style.animation = `moveUp${currentSpeed.charAt(0).toUpperCase() + currentSpeed.slice(1)} ${animationDuration}s linear infinite`;
+                
+                const img = document.createElement('img');
+                img.src = imageData.src;
+                img.alt = imageData.title;
+                img.loading = 'lazy';
+                
+                const overlay = document.createElement('div');
+                overlay.className = 'image-overlay';
+                overlay.innerHTML = `
+                    <div class="image-title">${imageData.title}</div>
+                    <div class="image-description">${imageData.description}</div>
+                `;
+                
+                container.appendChild(img);
+                container.appendChild(overlay);
+                
+                // Événements
+                container.addEventListener('click', () => openModal(imageData.src, imageData.title));
+                container.addEventListener('mouseenter', () => {
+                    container.classList.add('paused');
+                    cursor.style.transform = 'scale(2)';
+                });
+                container.addEventListener('mouseleave', () => {
+                    container.classList.remove('paused');
+                    cursor.style.transform = 'scale(1)';
+                });
+                
+                gallery.appendChild(container);
+                
+                // Supprimer après animation
+                setTimeout(() => {
+                    if (container.parentNode) {
+                        container.remove();
+                    }
+                }, animationDuration * 1000);
+                
+            }, delay);
+        }
+
+        function getAnimationDuration() {
+            switch(currentSpeed) {
+                case 'fast': return 8;
+                case 'slow': return 20;
+                default: return 12;
+            }
+        }
+
+        function getSpawnInterval() {
+            switch(currentSpeed) {
+                case 'fast': return 800;
+                case 'slow': return 3000;
+                default: return 1500;
+            }
+        }
+
+        function startFloatingAnimation() {
+            const spawnInterval = getSpawnInterval();
+            
+            const interval = setInterval(() => {
+                const randomImage = images[Math.floor(Math.random() * images.length)];
+                createFloatingImage(randomImage);
+                
+                // Créer un texte flottant occasionnellement (tous les 3-4 groupes d'images)
+                if (imageGroupCounter % 3 === 0) {
+                    setTimeout(() => {
+                        createFloatingText();
+                    }, Math.random() * 2000 + 1000);
+                }
+                imageGroupCounter++;
+            }, spawnInterval);
+            
+            animationIntervals.push(interval);
+        }
+
+        function setAnimationSpeed(speed) {
+            currentSpeed = speed;
+            
+            // Mettre à jour les boutons
+            document.querySelectorAll('.control-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Redémarrer avec la nouvelle vitesse
+            resetGallery();
+            setTimeout(() => {
+                startFloatingAnimation();
+                setTimeout(() => {
+                    createFloatingText();
+                }, 3000);
+            }, 500);
+        }
+
+        function resetGallery() {
+            // Arrêter toutes les animations
+            animationIntervals.forEach(interval => clearInterval(interval));
+            animationIntervals = [];
+            
+            // Supprimer toutes les images et textes
+            const containers = document.querySelectorAll('.image-container');
+            const texts = document.querySelectorAll('.floating-text');
+            containers.forEach(container => container.remove());
+            texts.forEach(text => text.remove());
+            
+            // Réinitialiser les compteurs
+            textIndex = 0;
+            imageGroupCounter = 0;
+        }
+
+        // Modal functions
+        function openModal(src, title) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            
+            modalImage.src = src;
+            modalImage.alt = title;
+            modal.classList.add('active');
+            
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Événements clavier
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Fermer modal en cliquant à l'extérieur
+        document.getElementById('imageModal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                closeModal();
+            }
+        });
+
+        // === CURSEUR DYNAMIQUE ===
+        class DynamicCursor {
+            constructor() {
+                this.cursor = document.querySelector('.custom-cursor');
+                this.init();
+            }
+
+            init() {
+                document.addEventListener('mousemove', (e) => {
+                    this.cursor.style.left = e.clientX + 'px';
+                    this.cursor.style.top = e.clientY + 'px';
+                });
+
+                // Effets sur les éléments interactifs
+                const interactiveElements = document.querySelectorAll('button, .image-container, .control-btn, .song-item');
+                
+                interactiveElements.forEach(element => {
+                    element.addEventListener('mouseenter', () => {
+                        this.cursor.style.transform = 'scale(1.5)';
+                        this.cursor.style.background = 'rgba(255, 85, 60, 0.8)';
+                        this.cursor.style.mixBlendMode = 'difference';
+                    });
+
+                    element.addEventListener('mouseleave', () => {
+                        this.cursor.style.transform = 'scale(1)';
+                        this.cursor.style.background = 'rgba(255, 255, 255, 0.8)';
+                        this.cursor.style.mixBlendMode = 'normal';
+                    });
+
+                    element.addEventListener('mousedown', () => {
+                        this.cursor.style.transform = 'scale(0.8)';
+                    });
+
+                    element.addEventListener('mouseup', () => {
+                        this.cursor.style.transform = 'scale(1.5)';
+                    });
+                });
+            }
+        }
+
+        // === MICRO-INTERACTIONS ===
+        class MicroInteractions {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                this.addRippleEffect();
+                this.addHoverMagnification();
+                this.addScrollParallax();
+            }
+
+            addRippleEffect() {
+                const buttons = document.querySelectorAll('.control-btn, .music-toggle');
+                
+                buttons.forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const ripple = document.createElement('span');
+                        const rect = button.getBoundingClientRect();
+                        const size = Math.max(rect.width, rect.height);
+                        const x = e.clientX - rect.left - size / 2;
+                        const y = e.clientY - rect.top - size / 2;
+                        
+                        ripple.style.cssText = `
+                            position: absolute;
+                            width: ${size}px;
+                            height: ${size}px;
+                            left: ${x}px;
+                            top: ${y}px;
+                            background: rgba(255, 255, 255, 0.6);
+                            border-radius: 50%;
+                            transform: scale(0);
+                            animation: ripple 0.6s ease-out;
+                            pointer-events: none;
+                        `;
+                        
+                        button.style.position = 'relative';
+                        button.style.overflow = 'hidden';
+                        button.appendChild(ripple);
+                        
+                        setTimeout(() => ripple.remove(), 600);
+                    });
+                });
+            }
+
+            addHoverMagnification() {
+                const images = document.querySelectorAll('.image-container');
+                
+                images.forEach(image => {
+                    image.addEventListener('mouseenter', () => {
+                        image.style.zIndex = '1000';
+                        image.style.transition = 'all 0.3s cubic-bezier(0.23, 1, 0.32, 1)';
+                    });
+                    
+                    image.addEventListener('mouseleave', () => {
+                        image.style.zIndex = '';
+                    });
+                });
+            }
+
+            addScrollParallax() {
+                window.addEventListener('scroll', () => {
+                    const scrolled = window.pageYOffset;
+                    const parallax1 = document.querySelector('.parallax-layer-1');
+                    const parallax2 = document.querySelector('.parallax-layer-2');
+                    
+                    if (parallax1) {
+                        parallax1.style.transform = `translate3d(0, ${scrolled * 0.5}px, 0) rotate(${scrolled * 0.01}deg)`;
+                    }
+                    if (parallax2) {
+                        parallax2.style.transform = `translate3d(0, ${scrolled * -0.3}px, 0) rotate(${scrolled * -0.005}deg)`;
+                    }
+                });
+            }
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            startFloatingAnimation();
+            new DynamicCursor();
+            new MicroInteractions();
+            
+            // Ajouter les animations CSS pour les ripples
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ripple {
+                    to {
+                        transform: scale(2);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Créer le premier texte après un délai
+            setTimeout(() => {
+                createFloatingText();
+            }, 3000);
+        });
+
+        // Gestion de la visibilité de la page
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                resetGallery();
+            } else {
+                setTimeout(() => {
+                    startFloatingAnimation();
+                    setTimeout(() => {
+                        createFloatingText();
+                    }, 3000);
+                }, 1000);
+            }
+        });
+
+        // === SYSTÈME MUSICAL ===
+        class MusicPlayer {
+            constructor() {
+                this.songs = [
+                    { title: "Moran & Ocre", file: "music/Moran & Ocre.mp3" },
+                    { title: "Ngoma ya Nywele (Le tambour des cheveux)", file: "music/Ngoma ya Nywele (Le tambour des cheveux).mp3" },
+                    { title: "Nzoto Etumba (La Rencontre)", file: "music/Nzoto Etumba (La Rencontre)2 (Remastered) (Vocals).mp3" },
+                    { title: "Suku Royal", file: "music/Suku Royal.mp3" }
+                ];
+                this.currentSongIndex = 0;
+                this.audio = new Audio();
+                this.isPlaying = false;
+                this.isShuffled = false;
+                this.originalOrder = [...this.songs];
+                
+                this.initializePlayer();
+                this.setupEventListeners();
+            }
+
+            initializePlayer() {
+                // Configuration audio
+                this.audio.volume = 0.7;
+                this.audio.preload = 'metadata';
+                
+                // Événements audio
+                this.audio.addEventListener('ended', () => this.nextSong());
+                this.audio.addEventListener('loadedmetadata', () => this.updateDuration());
+                this.audio.addEventListener('error', (e) => {
+                    console.warn('Erreur de chargement audio:', e);
+                    this.nextSong();
+                });
+                
+                // Générer la playlist
+                this.generatePlaylist();
+                
+                // Charger la première chanson
+                this.loadSong(0);
+            }
+
+            setupEventListeners() {
+                // Toggle menu
+                document.getElementById('musicToggle').addEventListener('click', () => {
+                    this.toggleMenu();
+                });
+
+                // Contrôles
+                document.getElementById('playBtn').addEventListener('click', () => this.play());
+                document.getElementById('pauseBtn').addEventListener('click', () => this.pause());
+                document.getElementById('stopBtn').addEventListener('click', () => this.stop());
+                document.getElementById('shuffleBtn').addEventListener('click', () => this.toggleShuffle());
+
+                // Volume
+                document.getElementById('volumeSlider').addEventListener('input', (e) => {
+                    this.setVolume(e.target.value / 100);
+                });
+            }
+
+            generatePlaylist() {
+                const playlist = document.getElementById('playlist');
+                playlist.innerHTML = '';
+                
+                this.songs.forEach((song, index) => {
+                    const songItem = document.createElement('div');
+                    songItem.className = 'song-item';
+                    songItem.innerHTML = `
+                        <div class="song-title">${song.title}</div>
+                        <div class="song-duration" id="duration-${index}">--:--</div>
+                    `;
+                    
+                    songItem.addEventListener('click', () => {
+                        this.loadSong(index);
+                        this.play();
+                    });
+                    
+                    playlist.appendChild(songItem);
+                });
+            }
+
+            loadSong(index) {
+                if (index >= 0 && index < this.songs.length) {
+                    this.currentSongIndex = index;
+                    this.audio.src = this.songs[index].file;
+                    this.updatePlaylistUI();
+                }
+            }
+
+            play() {
+                if (this.audio.src) {
+                    this.audio.play().then(() => {
+                        this.isPlaying = true;
+                        this.updateControlsUI();
+                    }).catch(e => {
+                        console.warn('Erreur de lecture:', e);
+                    });
+                }
+            }
+
+            pause() {
+                this.audio.pause();
+                this.isPlaying = false;
+                this.updateControlsUI();
+            }
+
+            stop() {
+                this.audio.pause();
+                this.audio.currentTime = 0;
+                this.isPlaying = false;
+                this.updateControlsUI();
+            }
+
+            nextSong() {
+                let nextIndex = (this.currentSongIndex + 1) % this.songs.length;
+                this.loadSong(nextIndex);
+                if (this.isPlaying) {
+                    this.play();
+                }
+            }
+
+            toggleShuffle() {
+                this.isShuffled = !this.isShuffled;
+                
+                if (this.isShuffled) {
+                    // Mélanger les chansons
+                    const currentSong = this.songs[this.currentSongIndex];
+                    this.songs = [...this.originalOrder].sort(() => Math.random() - 0.5);
+                    this.currentSongIndex = this.songs.findIndex(song => song === currentSong);
+                } else {
+                    // Restaurer l'ordre original
+                    const currentSong = this.songs[this.currentSongIndex];
+                    this.songs = [...this.originalOrder];
+                    this.currentSongIndex = this.songs.findIndex(song => song === currentSong);
+                }
+                
+                this.generatePlaylist();
+                this.updatePlaylistUI();
+                this.updateControlsUI();
+            }
+
+            setVolume(volume) {
+                this.audio.volume = Math.max(0, Math.min(1, volume));
+            }
+
+            toggleMenu() {
+                const menu = document.getElementById('musicMenu');
+                menu.classList.toggle('collapsed');
+            }
+
+            updatePlaylistUI() {
+                const songItems = document.querySelectorAll('.song-item');
+                songItems.forEach((item, index) => {
+                    item.classList.toggle('playing', index === this.currentSongIndex);
+                });
+            }
+
+            updateControlsUI() {
+                const playBtn = document.getElementById('playBtn');
+                const pauseBtn = document.getElementById('pauseBtn');
+                const shuffleBtn = document.getElementById('shuffleBtn');
+                
+                playBtn.classList.toggle('active', this.isPlaying);
+                pauseBtn.classList.toggle('active', !this.isPlaying && this.audio.currentTime > 0);
+                shuffleBtn.classList.toggle('active', this.isShuffled);
+            }
+
+            updateDuration() {
+                const duration = this.audio.duration;
+                if (!isNaN(duration)) {
+                    const minutes = Math.floor(duration / 60);
+                    const seconds = Math.floor(duration % 60);
+                    const durationElement = document.getElementById(`duration-${this.currentSongIndex}`);
+                    if (durationElement) {
+                        durationElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    }
+                }
+            }
+        }
+
+        // Classe pour gérer le drag and drop du menu musical
+        class DragHandler {
+            constructor(element) {
+                this.element = element;
+                this.isDragging = false;
+                this.startX = 0;
+                this.startY = 0;
+                this.initialX = 0;
+                this.initialY = 0;
+                
+                this.setupDragListeners();
+            }
+
+            setupDragListeners() {
+                // Rendre tout le menu draggable
+                this.element.style.cursor = 'move';
+                this.element.style.userSelect = 'none';
+                
+                // Événements de drag sur tout l'élément
+                this.element.addEventListener('mousedown', this.startDrag.bind(this));
+                document.addEventListener('mousemove', this.drag.bind(this));
+                document.addEventListener('mouseup', this.endDrag.bind(this));
+                
+                // Support tactile
+                this.element.addEventListener('touchstart', this.startDrag.bind(this));
+                document.addEventListener('touchmove', this.drag.bind(this));
+                document.addEventListener('touchend', this.endDrag.bind(this));
+                
+                // Empêcher la sélection de texte pendant le drag
+                this.element.addEventListener('selectstart', (e) => {
+                    if (this.isDragging) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            startDrag(e) {
+                this.isDragging = true;
+                
+                const clientX = e.clientX || e.touches[0].clientX;
+                const clientY = e.clientY || e.touches[0].clientY;
+                
+                this.startX = clientX;
+                this.startY = clientY;
+                
+                const rect = this.element.getBoundingClientRect();
+                this.initialX = rect.left;
+                this.initialY = rect.top;
+                
+                this.element.style.transition = 'none';
+                this.element.style.cursor = 'grabbing';
+                
+                e.preventDefault();
+            }
+
+            drag(e) {
+                if (!this.isDragging) return;
+                
+                const clientX = e.clientX || e.touches[0].clientX;
+                const clientY = e.clientY || e.touches[0].clientY;
+                
+                const deltaX = clientX - this.startX;
+                const deltaY = clientY - this.startY;
+                
+                let newX = this.initialX + deltaX;
+                let newY = this.initialY + deltaY;
+                
+                // Contraintes pour rester dans la fenêtre
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+                const elementWidth = this.element.offsetWidth;
+                const elementHeight = this.element.offsetHeight;
+                
+                newX = Math.max(0, Math.min(newX, windowWidth - elementWidth));
+                newY = Math.max(0, Math.min(newY, windowHeight - elementHeight));
+                
+                this.element.style.left = newX + 'px';
+                this.element.style.top = newY + 'px';
+                this.element.style.right = 'auto';
+                this.element.style.transform = 'none';
+                
+                e.preventDefault();
+            }
+
+            endDrag() {
+                if (!this.isDragging) return;
+                
+                this.isDragging = false;
+                this.element.style.transition = 'all 0.5s cubic-bezier(0.23, 1, 0.32, 1)';
+                this.element.style.cursor = 'default';
+                
+                // Sauvegarder la position
+                this.savePosition();
+            }
+
+            savePosition() {
+                const rect = this.element.getBoundingClientRect();
+                localStorage.setItem('musicMenuPosition', JSON.stringify({
+                    left: rect.left,
+                    top: rect.top
+                }));
+            }
+
+            loadPosition() {
+                const savedPosition = localStorage.getItem('musicMenuPosition');
+                if (savedPosition) {
+                    const position = JSON.parse(savedPosition);
+                    this.element.style.left = position.left + 'px';
+                    this.element.style.top = position.top + 'px';
+                    this.element.style.right = 'auto';
+                    this.element.style.transform = 'none';
+                }
+            }
+        }
+
+        // Initialiser le lecteur musical et le drag handler
+        let musicPlayer;
+        let dragHandler;
+        document.addEventListener('DOMContentLoaded', () => {
+            musicPlayer = new MusicPlayer();
+            
+            // Initialiser le drag handler pour le menu musical
+            const musicMenu = document.querySelector('.music-menu');
+            if (musicMenu) {
+                dragHandler = new DragHandler(musicMenu);
+                dragHandler.loadPosition();
+            }
+        });
+    </script>
+</body>
+</html>
