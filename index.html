@@ -1270,6 +1270,9 @@
                 this.currentLayout = 0;
                 this.layouts = ['grid', 'line', 'circle'];
                 this.touchFeedback = null;
+                this.navigationMode = 'image'; // 'image' ou 'layout'
+                this.currentImageIndex = 0;
+                this.totalImages = 0;
                 
                 if (this.isMobile) {
                     this.init();
@@ -1296,21 +1299,42 @@
                 const navControls = document.createElement('div');
                 navControls.className = 'mobile-nav-controls';
                 navControls.innerHTML = `
-                    <button class="mobile-nav-btn" data-action="prev" title="Précédent">
+                    <button class="mobile-nav-btn" data-action="prev-image" title="Image précédente">
                         ◀
                     </button>
-                    <button class="mobile-nav-btn active" data-action="layout" title="Changer de vue">
+                    <button class="mobile-nav-btn" data-action="layout" title="Changer de vue">
                         ⊞
                     </button>
-                    <button class="mobile-nav-btn" data-action="next" title="Suivant">
+                    <button class="mobile-nav-btn" data-action="next-image" title="Image suivante">
                         ▶
                     </button>
+                    <button class="mobile-nav-btn" data-action="switch-mode" title="Basculer mode">
+                        ⚡
+                    </button>
+                `;
+
+                // Ajouter les contrôles de mode
+                const modeIndicator = document.createElement('div');
+                modeIndicator.className = 'mobile-mode-indicator';
+                modeIndicator.textContent = 'Navigation par image';
+                modeIndicator.style.cssText = `
+                    position: fixed;
+                    bottom: 80px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: rgba(0, 0, 0, 0.7);
+                    color: white;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    z-index: 999;
+                    transition: opacity 0.3s ease;
                 `;
 
                 // Ajouter l'indicateur de swipe
                 const swipeHint = document.createElement('div');
                 swipeHint.className = 'mobile-swipe-hint';
-                swipeHint.textContent = '← Glissez pour naviguer →';
+                swipeHint.textContent = '← Image précédente/suivante → | ↑ Changer mode';
 
                 // Ajouter la barre de progression
                 const progressBar = document.createElement('div');
@@ -1322,6 +1346,7 @@
                 swipeZone.className = 'swipe-zone';
 
                 document.body.appendChild(navControls);
+                document.body.appendChild(modeIndicator);
                 document.body.appendChild(swipeHint);
                 document.body.appendChild(progressBar);
                 document.body.appendChild(swipeZone);
@@ -1345,14 +1370,29 @@
 
             handleButtonAction(action) {
                 switch (action) {
-                    case 'prev':
-                        this.navigateLayout(-1);
+                    case 'prev-image':
+                        if (this.navigationMode === 'image') {
+                            this.navigateImage(-1);
+                        } else {
+                            this.navigateLayout(-1);
+                        }
                         break;
-                    case 'next':
-                        this.navigateLayout(1);
+                    case 'next-image':
+                        if (this.navigationMode === 'image') {
+                            this.navigateImage(1);
+                        } else {
+                            this.navigateLayout(1);
+                        }
                         break;
                     case 'layout':
-                        this.cycleLayout();
+                        if (this.navigationMode === 'image') {
+                            this.focusCurrentImage();
+                        } else {
+                            this.cycleLayout();
+                        }
+                        break;
+                    case 'switch-mode':
+                        this.toggleNavigationMode();
                         break;
                 }
                 
@@ -1392,12 +1432,30 @@
                 
                 // Déterminer si c'est un swipe horizontal
                 if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > this.minSwipeDistance) {
-                    if (deltaX > 0) {
-                        // Swipe vers la droite - layout précédent
-                        this.navigateLayout(-1);
+                    if (this.navigationMode === 'image') {
+                        if (deltaX > 0) {
+                            // Swipe vers la droite - image précédente
+                            this.navigateImage(-1);
+                        } else {
+                            // Swipe vers la gauche - image suivante
+                            this.navigateImage(1);
+                        }
                     } else {
-                        // Swipe vers la gauche - layout suivant
-                        this.navigateLayout(1);
+                        if (deltaX > 0) {
+                            // Swipe vers la droite - layout précédent
+                            this.navigateLayout(-1);
+                        } else {
+                            // Swipe vers la gauche - layout suivant
+                            this.navigateLayout(1);
+                        }
+                    }
+                }
+                
+                // Swipe vertical pour changer de mode
+                else if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > this.minSwipeDistance) {
+                    if (deltaY < 0) {
+                        // Swipe vers le haut - basculer mode
+                        this.toggleNavigationMode();
                     }
                 }
             }
@@ -1491,6 +1549,121 @@
                     wrapper.style.transform = originalTransform;
                 }, 150);
             }
+
+            // Nouvelles méthodes pour la navigation image par image
+            navigateImage(direction) {
+                const images = document.querySelectorAll('.image-wrapper');
+                this.totalImages = images.length;
+                
+                if (this.totalImages === 0) return;
+                
+                // Enlever le focus de l'image actuelle
+                const currentImage = images[this.currentImageIndex];
+                if (currentImage) {
+                    currentImage.classList.remove('mobile-focused');
+                }
+                
+                // Calculer nouvel index
+                this.currentImageIndex = (this.currentImageIndex + direction + this.totalImages) % this.totalImages;
+                
+                // Ajouter le focus à la nouvelle image
+                const newImage = images[this.currentImageIndex];
+                if (newImage) {
+                    newImage.classList.add('mobile-focused');
+                    this.scrollToImage(newImage);
+                }
+                
+                this.updateImageCounter();
+            }
+
+            focusCurrentImage() {
+                const images = document.querySelectorAll('.image-wrapper');
+                const currentImage = images[this.currentImageIndex];
+                if (currentImage && currentImage.click) {
+                    currentImage.click();
+                }
+            }
+
+            scrollToImage(imageElement) {
+                // Centrer l'image dans la vue si possible
+                imageElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'center'
+                });
+            }
+
+            toggleNavigationMode() {
+                this.navigationMode = this.navigationMode === 'image' ? 'layout' : 'image';
+                this.updateModeIndicator();
+                this.updateButtonIcons();
+                
+                if (this.navigationMode === 'image') {
+                    this.initImageNavigation();
+                } else {
+                    this.clearImageFocus();
+                }
+            }
+
+            updateModeIndicator() {
+                const indicator = document.querySelector('.mobile-mode-indicator');
+                if (indicator) {
+                    indicator.textContent = this.navigationMode === 'image' ? 
+                        'Navigation par image' : 'Navigation par layout';
+                }
+            }
+
+            updateButtonIcons() {
+                const switchBtn = document.querySelector('[data-action="switch-mode"]');
+                const layoutBtn = document.querySelector('[data-action="layout"]');
+                
+                if (switchBtn) {
+                    switchBtn.textContent = this.navigationMode === 'image' ? '⚡' : '🎯';
+                }
+                
+                if (layoutBtn) {
+                    layoutBtn.textContent = this.navigationMode === 'image' ? '👁' : '⊞';
+                }
+            }
+
+            initImageNavigation() {
+                const images = document.querySelectorAll('.image-wrapper');
+                this.totalImages = images.length;
+                this.currentImageIndex = 0;
+                
+                // Ajouter le style pour le focus mobile
+                if (!document.querySelector('#mobile-focus-style')) {
+                    const style = document.createElement('style');
+                    style.id = 'mobile-focus-style';
+                    style.textContent = `
+                        .image-wrapper.mobile-focused {
+                            outline: 3px solid #ff4136 !important;
+                            outline-offset: 2px;
+                            z-index: 100 !important;
+                            box-shadow: 0 0 20px rgba(255, 65, 54, 0.8) !important;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+                
+                if (images.length > 0) {
+                    images[0].classList.add('mobile-focused');
+                    this.updateImageCounter();
+                }
+            }
+
+            clearImageFocus() {
+                const focusedImages = document.querySelectorAll('.image-wrapper.mobile-focused');
+                focusedImages.forEach(img => img.classList.remove('mobile-focused'));
+            }
+
+            updateImageCounter() {
+                const progressBar = document.querySelector('.mobile-progress-bar');
+                if (progressBar && this.totalImages > 0) {
+                    const progress = ((this.currentImageIndex + 1) / this.totalImages) * 100;
+                    progressBar.style.width = `${progress}%`;
+                }
+            }
         }
 
         // Initialisation automatique sur mobile
@@ -1510,6 +1683,11 @@
                     if (cursor) {
                         cursor.style.display = 'none';
                     }
+                    
+                    // Activer la navigation image par défaut
+                    setTimeout(() => {
+                        mobileNav.initImageNavigation();
+                    }, 2000);
                 }
             }, 1000);
         });
