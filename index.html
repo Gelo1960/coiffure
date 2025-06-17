@@ -132,13 +132,13 @@
             /* BARRE DE PROGRESSION */
             .mobile-progress-bar {
                 position: fixed;
-                top: 0;
+                bottom: 0;
                 left: 0;
                 height: 3px;
-                background: var(--accent-color, #ff4136);
+                background: linear-gradient(90deg, #ff4136, #ff851b, #ffdc00);
                 z-index: 1001;
                 transition: width 0.3s ease;
-                opacity: 0.8;
+                min-width: 10px;
             }
         }
 
@@ -1350,15 +1350,10 @@
                 progressBar.className = 'mobile-progress-bar';
                 progressBar.style.width = '33%'; // Layout initial grid
 
-                // Ajouter la zone de swipe invisible
-                const swipeZone = document.createElement('div');
-                swipeZone.className = 'swipe-zone';
-
                 document.body.appendChild(navControls);
                 document.body.appendChild(modeIndicator);
                 document.body.appendChild(swipeHint);
                 document.body.appendChild(progressBar);
-                document.body.appendChild(swipeZone);
 
                 // Masquer l'indicateur après 5 secondes
                 setTimeout(() => {
@@ -1370,12 +1365,29 @@
             }
 
             setupButtonHandlers(navControls) {
-                navControls.addEventListener('click', (e) => {
-                    const action = e.target.dataset.action;
-                    if (action) {
-                        this.handleButtonAction(action);
-                        this.addTouchFeedback(e.target);
+                let buttonTouchStart = null;
+
+                navControls.addEventListener('touchstart', (e) => {
+                    if (e.target.dataset.action) {
+                        buttonTouchStart = { x: e.changedTouches[0].screenX, y: e.changedTouches[0].screenY };
                     }
+                }, { passive: true });
+
+                navControls.addEventListener('touchend', (e) => {
+                    if (buttonTouchStart && e.target.dataset.action) {
+                        const touchEndX = e.changedTouches[0].screenX;
+                        const touchEndY = e.changedTouches[0].screenY;
+                        const deltaX = Math.abs(touchEndX - buttonTouchStart.x);
+                        const deltaY = Math.abs(touchEndY - buttonTouchStart.y);
+
+                        // If it's a small movement, consider it a tap
+                        if (deltaX < 10 && deltaY < 10) {
+                            const action = e.target.dataset.action;
+                            this.handleButtonAction(action);
+                            this.addTouchFeedback(e.target);
+                        }
+                    }
+                    buttonTouchStart = null;
                 });
                 
                 // Ajouter les styles CSS pour les contrôles mobiles
@@ -1413,15 +1425,15 @@
             }
 
             setupTouchNavigation() {
-                const swipeZone = document.querySelector('.swipe-zone') || document.body;
+                const swipeTarget = document.body;
                 
                 // Gestion du swipe horizontal pour navigation
-                swipeZone.addEventListener('touchstart', (e) => {
+                swipeTarget.addEventListener('touchstart', (e) => {
                     this.touchStartX = e.changedTouches[0].screenX;
                     this.touchStartY = e.changedTouches[0].screenY;
                 }, { passive: true });
 
-                swipeZone.addEventListener('touchend', (e) => {
+                swipeTarget.addEventListener('touchend', (e) => {
                     this.touchEndX = e.changedTouches[0].screenX;
                     this.touchEndY = e.changedTouches[0].screenY;
                     this.handleSwipe();
@@ -1626,16 +1638,6 @@
                         min-width: 10px;
                     }
 
-                    .swipe-zone {
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        z-index: -1;
-                        pointer-events: none;
-                    }
-
                     .touch-feedback {
                         position: fixed;
                         width: 40px;
@@ -1748,13 +1750,6 @@
                             buttonsCount: buttons.length,
                             progressBar: !!progressBar
                         });
-                        
-                        if (controls) {
-                            controls.style.border = '2px solid red'; // Debug visuel
-                            setTimeout(() => {
-                                controls.style.border = '1px solid rgba(255, 255, 255, 0.1)';
-                            }, 2000);
-                        }
                         
                         mobileNav.initScrollTracking();
                     }, 1000);
