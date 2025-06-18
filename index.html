@@ -527,14 +527,52 @@
             imageUpload.addEventListener('change', (event) => {
                 const file = event.target.files[0];
                 if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        // On passe l'URL de l'image locale à notre galerie
-                        gallery.addUserImage(e.target.result);
-                    };
-                    reader.readAsDataURL(file); // Convertit l'image en une URL de données
+                    const formData = new FormData();
+                    formData.append('uploaded_image', file);
+
+                    fetch('/upload', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.filePath) {
+                            gallery.addUserImage(data.filePath);
+                        } else {
+                            console.error("L'upload a échoué.", data.error);
+                        }
+                    })
+                    .catch(error => console.error("Erreur lors de l'upload:", error));
                 }
             });
+
+            // Charger les images initiales (existantes + uploadées)
+            async function loadInitialImages() {
+                let uploadedImages = [];
+                try {
+                    const response = await fetch('/images');
+                    const imageFiles = await response.json();
+                    uploadedImages = imageFiles.map(file => ({
+                        src: `/uploads/${file}`,
+                        title: 'Image Ajoutée'
+                    }));
+                } catch (error) {
+                    console.error("Impossible de charger les images uploadées:", error);
+                }
+
+                const allImages = [...images, ...uploadedImages];
+                
+                gallery = new InteractiveGallery('gallery-container', allImages);
+                gallery.init();
+                
+                magneticCursor = new MagneticCursor();
+                musicPlayer = new MusicPlayer();
+                const musicMenuElement = document.getElementById('musicMenu');
+                const musicMenuHandle = document.getElementById('musicMenuHandle');
+                draggableMenu = new Draggable(musicMenuElement, musicMenuHandle);
+            }
+
+            loadInitialImages();
         });
 
         function openModal(src) { if (imageModal.classList.contains('active')) return; gallery.togglePause(true); mainContainer.classList.add('modal-open'); imageModal.classList.add('active'); document.getElementById('modalImage').src = src; }

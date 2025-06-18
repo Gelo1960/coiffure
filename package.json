@@ -1,0 +1,25 @@
+{
+  "name": "site-inspiration-coiffure-",
+  "version": "1.0.0",
+  "description": "> **Une galerie interactive moderne présentant la richesse des coiffures africaines traditionnelles et contemporaines, avec des animations fluides et des effets visuels sophistiqués inspirés du design Apple 2025.**",
+  "main": "enhanced-features.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gelo1960/coiffure.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Gelo1960/coiffure/issues"
+  },
+  "homepage": "https://github.com/Gelo1960/coiffure#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "multer": "^2.0.1"
+  }
+}
