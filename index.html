@@ -527,37 +527,47 @@
             imageUpload.addEventListener('change', (event) => {
                 const file = event.target.files[0];
                 if (file) {
-                    const formData = new FormData();
-                    formData.append('uploaded_image', file);
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const base64Content = e.target.result.split(',')[1];
 
-                    fetch('/upload', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.filePath) {
-                            gallery.addUserImage(data.filePath);
-                        } else {
-                            console.error("L'upload a échoué.", data.error);
-                        }
-                    })
-                    .catch(error => console.error("Erreur lors de l'upload:", error));
+                        fetch('/api/upload', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                fileName: file.name,
+                                fileContent: base64Content
+                            }),
+                        })
+                        .then(response => response.json())
+                        .then(blob => {
+                            if (blob.url) {
+                                // On utilise l'URL retournée par Vercel Blob
+                                gallery.addUserImage(blob.url);
+                            } else {
+                                console.error("L'upload Vercel Blob a échoué.", blob.error);
+                            }
+                        })
+                        .catch(error => console.error("Erreur lors de l'upload:", error));
+                    };
+                    reader.readAsDataURL(file); // Convertit l'image en URL de données (contenant du base64)
                 }
             });
 
-            // Charger les images initiales (existantes + uploadées)
+            // Charger les images initiales (existantes + uploadées depuis Vercel Blob)
             async function loadInitialImages() {
                 let uploadedImages = [];
                 try {
-                    const response = await fetch('/images');
-                    const imageFiles = await response.json();
-                    uploadedImages = imageFiles.map(file => ({
-                        src: `/uploads/${file}`,
+                    const response = await fetch('/api/images');
+                    const blobs = await response.json();
+                    uploadedImages = blobs.map(blob => ({
+                        src: blob.url,
                         title: 'Image Ajoutée'
                     }));
                 } catch (error) {
-                    console.error("Impossible de charger les images uploadées:", error);
+                    console.error("Impossible de charger les images depuis Vercel Blob:", error);
                 }
 
                 const allImages = [...images, ...uploadedImages];
