@@ -3,9 +3,9 @@ const { put, list, del } = require('@vercel/blob');
 const path = require('path');
 const app = express();
 
-// Middleware pour parser le corps des requêtes POST
-// Vercel parse le corps pour nous, mais c'est une bonne pratique de l'inclure
-app.use(express.json()); 
+// Augmenter la limite de la taille du corps de la requête pour accepter les images en base64
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Servir les fichiers statiques du dossier racine
 app.use(express.static(path.join(__dirname, '..'))); 
