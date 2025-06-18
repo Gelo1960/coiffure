@@ -21,6 +21,46 @@
         /* Détection mobile */
         @media (pointer: coarse) and (max-width: 768px) {
             
+            body {
+                overflow-y: auto !important;
+                cursor: auto;
+                height: auto;
+            }
+
+            .container {
+                height: auto;
+                overflow: visible;
+                perspective: none;
+            }
+
+            #galleryContainer {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr); /* Grille de 2 colonnes */
+                gap: 15px;
+                padding: 15px;
+                position: relative !important;
+                transform: none !important;
+                width: 100%;
+                height: auto;
+            }
+
+            .image-wrapper {
+                position: relative !important;
+                width: 100% !important;
+                height: auto !important;
+                top: auto !important;
+                left: auto !important;
+                transform: none !important;
+                opacity: 1 !important;
+                margin: 0 !important;
+            }
+
+            .image-wrapper img {
+                width: 100%;
+                height: auto;
+                border-radius: 12px;
+            }
+
             /* CONTRÔLES MOBILES VISUELS */
             .mobile-nav-controls {
                 position: fixed;
@@ -97,19 +137,7 @@
 
             /* ZONE DE SWIPE INVISIBLE */
             .swipe-zone {
-                display: none; /* Désactivé pour le défilement natif */
-            }
-
-            body {
-                overflow-y: auto !important; /* Permet le défilement vertical */
-                -webkit-overflow-scrolling: touch; /* Améliore le défilement sur iOS */
-                height: auto; /* Permet au contenu de définir la hauteur */
-                cursor: auto; /* Affiche le curseur par défaut sur mobile */
-            }
-
-            .container {
-                height: auto; /* S'adapte à la hauteur du contenu */
-                overflow: visible;
+               display: none; /* On s'assure que ca n'interfère pas */
             }
 
             /* CURSEUR MASQUÉ SUR MOBILE */

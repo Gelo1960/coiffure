@@ -432,19 +432,21 @@ document.addEventListener('DOMContentLoaded', () => {
         hideLoadingScreen();
         updateImageCounter();
         
-        // Transition vers ligne après 4 secondes
-        setTimeout(() => {
-            console.log('Phase 2: Ligne'); // Debug
-            switchToMode('line');
-        }, 4000);
-        
-        // Transition vers cercle après 8 secondes
-        setTimeout(() => {
-            console.log('Phase 3: Cercle'); // Debug
-            switchToMode('circle');
-            isPlaying = true; // Activer la rotation automatique
-            startRotationAnimation();
-        }, 8000);
+        if (!isMobile) {
+            // Transition vers ligne après 4 secondes
+            setTimeout(() => {
+                console.log('Phase 2: Ligne'); // Debug
+                switchToMode('line');
+            }, 4000);
+            
+            // Transition vers cercle après 8 secondes
+            setTimeout(() => {
+                console.log('Phase 3: Cercle'); // Debug
+                switchToMode('circle');
+                isPlaying = true; // Activer la rotation automatique
+                startRotationAnimation();
+            }, 8000);
+        }
     }, 100);
 
     // Fonction pour filtrer les images
