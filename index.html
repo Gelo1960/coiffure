@@ -97,14 +97,19 @@
 
             /* ZONE DE SWIPE INVISIBLE */
             .swipe-zone {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 120px;
-                z-index: 500;
-                pointer-events: auto;
-                touch-action: pan-x pan-y;
+                display: none; /* Désactivé pour le défilement natif */
+            }
+
+            body {
+                overflow-y: auto !important; /* Permet le défilement vertical */
+                -webkit-overflow-scrolling: touch; /* Améliore le défilement sur iOS */
+                height: auto; /* Permet au contenu de définir la hauteur */
+                cursor: auto; /* Affiche le curseur par défaut sur mobile */
+            }
+
+            .container {
+                height: auto; /* S'adapte à la hauteur du contenu */
+                overflow: visible;
             }
 
             /* CURSEUR MASQUÉ SUR MOBILE */
@@ -149,6 +154,32 @@
                     padding-bottom: max(15px, env(safe-area-inset-bottom));
                 }
             }
+        }
+
+        /* Styles pour la galerie mobile */
+        .mobile-active #galleryContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            padding: 20px;
+            padding-bottom: 120px; /* Espace pour les contrôles de navigation */
+        }
+
+        .mobile-active .image-wrapper {
+            position: relative !important;
+            width: 100% !important;
+            height: auto !important;
+            top: auto !important;
+            left: auto !important;
+            transform: none !important;
+            opacity: 1 !important;
+        }
+
+        .mobile-active .image-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 8px;
         }
     </style>
     <style>
