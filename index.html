@@ -7,150 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     
-    <!-- AMÉLIORATIONS MOBILES CSS -->
-    <style>
-        /* Variables pour mobile */
-        :root {
-            --mobile-touch-target: 44px;
-            --mobile-spacing: 16px;
-            --mobile-image-size: 140px;
-            --swipe-threshold: 50px;
-            --touch-feedback-scale: 0.95;
-        }
-
-        /* Détection mobile */
-        @media (pointer: coarse) and (max-width: 768px) {
-            
-            /* CONTRÔLES MOBILES VISUELS */
-            .mobile-nav-controls {
-                position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                display: flex;
-                gap: 15px;
-                z-index: 1000;
-                background: rgba(0, 0, 0, 0.8);
-                padding: 15px 20px;
-                border-radius: 25px;
-                backdrop-filter: blur(20px);
-                border: 1px solid rgba(255, 255, 255, 0.2);
-            }
-
-            .mobile-nav-btn {
-                width: var(--mobile-touch-target);
-                height: var(--mobile-touch-target);
-                border: none;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.15);
-                color: white;
-                font-size: 18px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                transition: all 0.2s ease;
-                backdrop-filter: blur(10px);
-                -webkit-tap-highlight-color: transparent;
-                touch-action: manipulation;
-            }
-
-            .mobile-nav-btn:active {
-                transform: scale(var(--touch-feedback-scale));
-                background: rgba(255, 255, 255, 0.3);
-            }
-
-            .mobile-nav-btn.active {
-                background: var(--accent-color, #ff4136);
-                box-shadow: 0 0 20px rgba(255, 65, 54, 0.5);
-            }
-
-            /* INDICATEURS DE NAVIGATION */
-            .mobile-swipe-hint {
-                position: fixed;
-                bottom: 100px;
-                left: 50%;
-                transform: translateX(-50%);
-                color: rgba(255, 255, 255, 0.7);
-                font-size: 14px;
-                text-align: center;
-                z-index: 999;
-                animation: fadeInOut 3s ease-in-out infinite;
-                pointer-events: none;
-            }
-
-            @keyframes fadeInOut {
-                0%, 100% { opacity: 0.3; }
-                50% { opacity: 0.8; }
-            }
-
-            /* AMÉLIORATION DES IMAGES POUR MOBILE */
-            .image-wrapper {
-                touch-action: manipulation;
-                will-change: transform;
-                transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-            }
-
-            .image-wrapper:active {
-                transform: scale(0.98) !important;
-            }
-
-            /* ZONE DE SWIPE INVISIBLE */
-            .swipe-zone {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 120px; /* Laisse de la place pour les contrôles du bas */
-                z-index: 500;
-                /* pointer-events: auto; */ /* Le JS s'en charge si nécessaire */
-                touch-action: none; /* Empêche le navigateur de gérer le scroll */
-            }
-
-            /* CURSEUR MASQUÉ SUR MOBILE */
-            .cursor {
-                display: none !important;
-            }
-
-            /* FEEDBACK TACTILE */
-            .touch-feedback {
-                position: fixed;
-                width: 40px;
-                height: 40px;
-                background: rgba(255, 255, 255, 0.3);
-                border-radius: 50%;
-                pointer-events: none;
-                z-index: 9999;
-                transform: translate(-50%, -50%) scale(0);
-                transition: transform 0.3s ease-out;
-            }
-
-            .touch-feedback.active {
-                transform: translate(-50%, -50%) scale(1);
-            }
-
-            /* BARRE DE PROGRESSION */
-            .mobile-progress-bar {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                height: 3px;
-                background: linear-gradient(90deg, #ff4136, #ff851b, #ffdc00);
-                z-index: 1001;
-                transition: width 0.3s ease;
-                min-width: 10px;
-            }
-        }
-
-        /* Support des encoches d'iPhone */
-        @supports (padding: max(0px)) {
-            @media (pointer: coarse) and (max-width: 768px) {
-                .mobile-nav-controls {
-                    padding-bottom: max(15px, env(safe-area-inset-bottom));
-                }
-            }
-        }
-    </style>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Prata&family=Space+Grotesk:wght@300;400;500;700&display=swap');
         :root { --accent-color: #ff4136; --music-accent: #1db954; }
@@ -961,9 +817,58 @@
             }
 
             addEventListeners() {
-                window.addEventListener('wheel', e => { if (!this.scroll.isPaused) { this.scroll.velocity += e.deltaY * 0.04; } });
+                // --- Détection Mobile Simple ---
+                const isMobile = 'ontouchstart' in window;
+
+                // --- Variables pour le tactile ---
+                let lastTouchY = 0;
+                const sensitivity = 1.5; // Ajustez cette valeur pour la sensibilité du défilement tactile
+
+                if (isMobile) {
+                    // --- Gestion Tactile ---
+                    this.container.addEventListener('touchstart', e => {
+                        if (this.scroll.isPaused) return;
+                        lastTouchY = e.touches[0].clientY;
+                        this.scroll.velocity = 0; // Arrête le défilement en cours au toucher
+                        
+                        // Masquer le curseur custom sur mobile
+                        if(magneticCursor && magneticCursor.cursor) {
+                            magneticCursor.cursor.style.display = 'none';
+                        }
+
+                    }, { passive: true });
+
+                    this.container.addEventListener('touchmove', e => {
+                        if (this.scroll.isPaused) return;
+                        const currentY = e.touches[0].clientY;
+                        const deltaY = lastTouchY - currentY; // Inverser pour un défilement naturel
+                        
+                        // Appliquer la vélocité directement
+                        this.scroll.velocity += deltaY * sensitivity;
+                        
+                        lastTouchY = currentY;
+                    }, { passive: true });
+                    
+                    // Empêche le navigateur de gérer le défilement pour éviter les conflits
+                    this.container.style.touchAction = 'none';
+
+                } else {
+                    // --- Gestion Souris (pour ordinateur) ---
+                    window.addEventListener('wheel', e => { 
+                        if (!this.scroll.isPaused) { 
+                            // Augmenter la sensibilité pour la molette
+                            this.scroll.velocity += e.deltaY * 0.06; 
+                        } 
+                    });
+                }
+
                 document.getElementById('pauseBtn').addEventListener('click', () => this.togglePause());
-                window.addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); this.togglePause(); } });
+                window.addEventListener('keydown', e => { 
+                    if (e.code === 'Space') { 
+                        e.preventDefault(); 
+                        this.togglePause(); 
+                    } 
+                });
             }
             
             togglePause(forceState = null) {
@@ -1252,512 +1157,6 @@
 
             console.log(`Story elements created with ${animationTypes.length} varied animation types`);
         }
-    </script>
-    
-    <!-- SCRIPT MOBILE NAVIGATION -->
-    <script>
-        /**
-         * AMÉLIORATIONS MOBILES POUR LA NAVIGATION TACTILE
-         */
-        class MobileNavigation {
-            constructor() {
-                this.isMobile = this.detectMobile();
-                this.touchStartX = 0;
-                this.touchStartY = 0;
-                this.touchEndX = 0;
-                this.touchEndY = 0;
-                this.minSwipeDistance = 50;
-                this.currentLayout = 0;
-                this.layouts = ['grid', 'line', 'circle'];
-                this.touchFeedback = null;
-                
-                if (this.isMobile) {
-                    this.init();
-                }
-            }
-
-            detectMobile() {
-                const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                const isMobileScreen = window.innerWidth <= 768 && 'ontouchstart' in window;
-                const isMobile = isMobileUA || isMobileScreen;
-                
-                console.log('🔍 Détection mobile:', {
-                    userAgent: navigator.userAgent,
-                    isMobileUA,
-                    isMobileScreen,
-                    screenWidth: window.innerWidth,
-                    touchSupport: 'ontouchstart' in window,
-                    result: isMobile
-                });
-                
-                return isMobile;
-            }
-
-            init() {
-                console.log('📱 Initialisation navigation mobile...');
-                
-                this.setupMobileUI();
-                this.setupTouchNavigation();
-                this.setupTouchFeedback();
-                
-                console.log('✅ Navigation mobile activée !');
-            }
-
-            setupMobileUI() {
-                // Ajouter les contrôles de navigation mobiles
-                const navControls = document.createElement('div');
-                navControls.className = 'mobile-nav-controls';
-                navControls.innerHTML = `
-                    <button class="mobile-nav-btn" data-action="prev-layout" title="Vue précédente">
-                        ◀
-                    </button>
-                    <button class="mobile-nav-btn" data-action="layout" title="Changer de vue">
-                        ⊞
-                    </button>
-                    <button class="mobile-nav-btn" data-action="next-layout" title="Vue suivante">
-                        ▶
-                    </button>
-                    <button class="mobile-nav-btn" data-action="scroll-top" title="Retour en haut">
-                        ↑
-                    </button>
-                `;
-
-                // Ajouter les contrôles de mode
-                const modeIndicator = document.createElement('div');
-                modeIndicator.className = 'mobile-mode-indicator';
-                modeIndicator.textContent = 'Défilez verticalement pour naviguer';
-                modeIndicator.style.cssText = `
-                    position: fixed;
-                    bottom: 80px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background: rgba(0, 0, 0, 0.7);
-                    color: white;
-                    padding: 8px 16px;
-                    border-radius: 20px;
-                    font-size: 12px;
-                    z-index: 999;
-                    transition: opacity 0.3s ease;
-                `;
-
-                // Ajouter l'indicateur de swipe
-                const swipeHint = document.createElement('div');
-                swipeHint.className = 'mobile-swipe-hint';
-                swipeHint.textContent = '⬇ Défilez pour voir les images ⬇ | ← → Changer vue';
-
-                // Ajouter la barre de progression
-                const progressBar = document.createElement('div');
-                progressBar.className = 'mobile-progress-bar';
-                progressBar.style.width = '33%'; // Layout initial grid
-
-                document.body.appendChild(navControls);
-                document.body.appendChild(modeIndicator);
-                document.body.appendChild(swipeHint);
-                document.body.appendChild(progressBar);
-
-                // Masquer l'indicateur après 5 secondes
-                setTimeout(() => {
-                    swipeHint.style.opacity = '0';
-                    setTimeout(() => swipeHint.remove(), 500);
-                }, 5000);
-
-                this.setupButtonHandlers(navControls);
-            }
-
-            setupButtonHandlers(navControls) {
-                let buttonTouchStart = null;
-
-                navControls.addEventListener('touchstart', (e) => {
-                    if (e.target.dataset.action) {
-                        buttonTouchStart = { x: e.changedTouches[0].screenX, y: e.changedTouches[0].screenY };
-                    }
-                }, { passive: true });
-
-                navControls.addEventListener('touchend', (e) => {
-                    if (buttonTouchStart && e.target.dataset.action) {
-                        const touchEndX = e.changedTouches[0].screenX;
-                        const touchEndY = e.changedTouches[0].screenY;
-                        const deltaX = Math.abs(touchEndX - buttonTouchStart.x);
-                        const deltaY = Math.abs(touchEndY - buttonTouchStart.y);
-
-                        // If it's a small movement, consider it a tap
-                        if (deltaX < 10 && deltaY < 10) {
-                            const action = e.target.dataset.action;
-                            this.handleButtonAction(action);
-                            this.addTouchFeedback(e.target);
-                        }
-                    }
-                    buttonTouchStart = null;
-                });
-                
-                // Ajouter les styles CSS pour les contrôles mobiles
-                this.addMobileStyles();
-            }
-
-            handleButtonAction(action) {
-                console.log('📱 Action bouton:', action);
-                
-                switch (action) {
-                    case 'prev-layout':
-                        console.log('📱 Layout précédent');
-                        this.navigateLayout(-1);
-                        break;
-                    case 'next-layout':
-                        console.log('📱 Layout suivant');
-                        this.navigateLayout(1);
-                        break;
-                    case 'layout':
-                        console.log('📱 Cycle layout');
-                        this.cycleLayout();
-                        break;
-                    case 'scroll-top':
-                        console.log('📱 Retour en haut');
-                        this.scrollToTop();
-                        break;
-                    default:
-                        console.log('📱 Action inconnue:', action);
-                }
-                
-                // Vibration tactile si supportée
-                if (navigator.vibrate) {
-                    navigator.vibrate(50);
-                }
-            }
-
-            setupTouchNavigation() {
-                const swipeTarget = document.body;
-                
-                // Gestion du swipe horizontal pour navigation
-                swipeTarget.addEventListener('touchstart', (e) => {
-                    this.touchStartX = e.changedTouches[0].screenX;
-                    this.touchStartY = e.changedTouches[0].screenY;
-                }, { passive: true });
-
-                swipeTarget.addEventListener('touchend', (e) => {
-                    this.touchEndX = e.changedTouches[0].screenX;
-                    this.touchEndY = e.changedTouches[0].screenY;
-                    this.handleSwipe();
-                }, { passive: true });
-
-                // Améliorer le tap sur les images
-                document.addEventListener('touchend', (e) => {
-                    if (e.target.closest('.image-wrapper')) {
-                        const wrapper = e.target.closest('.image-wrapper');
-                        this.handleImageTap(wrapper);
-                    }
-                });
-            }
-
-            handleSwipe() {
-                const deltaX = this.touchEndX - this.touchStartX;
-                const deltaY = this.touchEndY - this.touchStartY;
-                
-                // Priorité au défilement vertical naturel - ne pas interférer
-                if (Math.abs(deltaY) > Math.abs(deltaX)) {
-                    // Laisser le défilement vertical naturel se faire
-                    return;
-                }
-                
-                // Déterminer si c'est un swipe horizontal significatif
-                if (Math.abs(deltaX) > this.minSwipeDistance * 1.5) {
-                    if (deltaX > 0) {
-                        // Swipe vers la droite - layout précédent
-                        this.navigateLayout(-1);
-                    } else {
-                        // Swipe vers la gauche - layout suivant
-                        this.navigateLayout(1);
-                    }
-                }
-            }
-
-            navigateLayout(direction) {
-                this.currentLayout = (this.currentLayout + direction + this.layouts.length) % this.layouts.length;
-                this.switchToLayout(this.layouts[this.currentLayout]);
-                this.updateProgressBar();
-                this.updateActiveButton();
-            }
-
-            cycleLayout() {
-                this.navigateLayout(1);
-            }
-
-            switchToLayout(layoutName) {
-                console.log(`📱 Passage au layout: ${layoutName}`);
-                
-                // Déclencher les touches clavier correspondantes
-                const keyMap = { 'grid': '1', 'line': '2', 'circle': '3' };
-                const key = keyMap[layoutName];
-                
-                if (key) {
-                    // Simuler une vraie pression de touche
-                    const keyEvent = new KeyboardEvent('keydown', { 
-                        key: key,
-                        code: `Digit${key}`,
-                        keyCode: 48 + parseInt(key),
-                        which: 48 + parseInt(key),
-                        bubbles: true,
-                        cancelable: true
-                    });
-                    document.dispatchEvent(keyEvent);
-                }
-            }
-
-            updateProgressBar() {
-                const progressBar = document.querySelector('.mobile-progress-bar');
-                if (progressBar) {
-                    const width = ((this.currentLayout + 1) / this.layouts.length) * 100;
-                    progressBar.style.width = `${width}%`;
-                }
-            }
-
-            updateActiveButton() {
-                const layoutBtn = document.querySelector('[data-action="layout"]');
-                if (layoutBtn) {
-                    const icons = ['⊞', '▬', '○'];
-                    layoutBtn.textContent = icons[this.currentLayout];
-                }
-            }
-
-            setupTouchFeedback() {
-                // Créer l'élément de feedback tactile
-                this.touchFeedback = document.createElement('div');
-                this.touchFeedback.className = 'touch-feedback';
-                document.body.appendChild(this.touchFeedback);
-            }
-
-            addTouchFeedback(element) {
-                if (!this.touchFeedback || !element) return;
-
-                const rect = element.getBoundingClientRect();
-                const x = rect.left + rect.width / 2;
-                const y = rect.top + rect.height / 2;
-
-                this.touchFeedback.style.left = `${x}px`;
-                this.touchFeedback.style.top = `${y}px`;
-                this.touchFeedback.classList.add('active');
-
-                setTimeout(() => {
-                    this.touchFeedback.classList.remove('active');
-                }, 300);
-            }
-
-            handleImageTap(wrapper) {
-                // Double tap pour focus
-                if (this.lastTapTime && Date.now() - this.lastTapTime < 300) {
-                    this.focusImage(wrapper);
-                } else {
-                    // Simple tap - sélection avec feedback
-                    this.selectImage(wrapper);
-                }
-                this.lastTapTime = Date.now();
-            }
-
-            focusImage(wrapper) {
-                // Interface avec le système existant de focus d'image
-                if (wrapper.click) {
-                    wrapper.click();
-                }
-            }
-
-            selectImage(wrapper) {
-                // Retour tactile visuel
-                const originalTransform = wrapper.style.transform;
-                wrapper.style.transform = wrapper.style.transform + ' scale(0.95)';
-                setTimeout(() => {
-                    wrapper.style.transform = originalTransform;
-                }, 150);
-            }
-
-            addMobileStyles() {
-                if (document.querySelector('#mobile-styles')) return;
-                
-                const style = document.createElement('style');
-                style.id = 'mobile-styles';
-                style.textContent = `
-                    .mobile-nav-controls {
-                        position: fixed;
-                        bottom: 20px;
-                        left: 50%;
-                        transform: translateX(-50%);
-                        display: flex;
-                        gap: 15px;
-                        z-index: 1000;
-                        background: rgba(0, 0, 0, 0.8);
-                        backdrop-filter: blur(10px);
-                        padding: 15px 20px;
-                        border-radius: 25px;
-                        border: 1px solid rgba(255, 255, 255, 0.1);
-                        touch-action: manipulation;
-                    }
-
-                    .mobile-nav-btn {
-                        background: rgba(255, 255, 255, 0.1);
-                        border: none;
-                        color: white;
-                        width: 50px;
-                        height: 50px;
-                        border-radius: 50%;
-                        font-size: 18px;
-                        cursor: pointer;
-                        transition: all 0.3s ease;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        touch-action: manipulation;
-                        user-select: none;
-                    }
-
-                    .mobile-nav-btn:hover, .mobile-nav-btn:active {
-                        background: rgba(255, 255, 255, 0.2);
-                        transform: scale(1.1);
-                    }
-
-                    .mobile-swipe-hint {
-                        position: fixed;
-                        top: 20px;
-                        left: 50%;
-                        transform: translateX(-50%);
-                        background: rgba(0, 0, 0, 0.7);
-                        color: white;
-                        padding: 10px 20px;
-                        border-radius: 20px;
-                        font-size: 14px;
-                        z-index: 999;
-                        transition: opacity 0.5s ease;
-                        text-align: center;
-                    }
-
-                    .mobile-progress-bar {
-                        position: fixed;
-                        bottom: 0;
-                        left: 0;
-                        height: 3px;
-                        background: linear-gradient(90deg, #ff4136, #ff851b, #ffdc00);
-                        z-index: 1001;
-                        transition: width 0.3s ease;
-                        min-width: 10px;
-                    }
-
-                    .touch-feedback {
-                        position: fixed;
-                        width: 40px;
-                        height: 40px;
-                        background: rgba(255, 255, 255, 0.3);
-                        border-radius: 50%;
-                        pointer-events: none;
-                        z-index: 9999;
-                        transform: translate(-50%, -50%) scale(0);
-                        transition: transform 0.3s ease;
-                    }
-
-                    .touch-feedback.active {
-                        transform: translate(-50%, -50%) scale(1);
-                    }
-
-                    @media (max-width: 768px) {
-                        body {
-                            touch-action: pan-y pinch-zoom;
-                            -webkit-overflow-scrolling: touch;
-                        }
-
-                        .mobile-nav-controls {
-                            padding: 12px 16px;
-                            gap: 12px;
-                        }
-
-                        .mobile-nav-btn {
-                            width: 45px;
-                            height: 45px;
-                            font-size: 16px;
-                        }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-
-            // Méthode pour retourner en haut de page
-            scrollToTop() {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-                
-                // Feedback visuel
-                const progressBar = document.querySelector('.mobile-progress-bar');
-                if (progressBar) {
-                    progressBar.style.width = '0%';
-                    setTimeout(() => {
-                        progressBar.style.width = '100%';
-                        setTimeout(() => {
-                            progressBar.style.width = '0%';
-                        }, 300);
-                    }, 100);
-                }
-            }
-
-            // Méthode pour suivre le défilement et mettre à jour la barre de progression
-            initScrollTracking() {
-                let ticking = false;
-                
-                const updateScrollProgress = () => {
-                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-                    const progress = (scrollTop / docHeight) * 100;
-                    
-                    const progressBar = document.querySelector('.mobile-progress-bar');
-                    if (progressBar) {
-                        progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
-                    }
-                    
-                    ticking = false;
-                };
-                
-                window.addEventListener('scroll', () => {
-                    if (!ticking) {
-                        requestAnimationFrame(updateScrollProgress);
-                        ticking = true;
-                    }
-                });
-            }
-        }
-
-        // Initialisation automatique sur mobile
-        document.addEventListener('DOMContentLoaded', () => {
-            // Attendre que les autres scripts soient chargés
-            setTimeout(() => {
-                const mobileNav = new MobileNavigation();
-                
-                // Exposer globalement pour debugging
-                window.mobileNav = mobileNav;
-                
-                if (mobileNav.isMobile) {
-                    console.log('📱 Navigation mobile avec défilement naturel activée');
-                    
-                    // Masquer le curseur custom sur mobile
-                    const cursor = document.querySelector('.cursor');
-                    if (cursor) {
-                        cursor.style.display = 'none';
-                    }
-                    
-                    // Vérifier si les contrôles sont bien créés
-                    setTimeout(() => {
-                        const controls = document.querySelector('.mobile-nav-controls');
-                        const buttons = document.querySelectorAll('.mobile-nav-btn');
-                        const progressBar = document.querySelector('.mobile-progress-bar');
-                        
-                        console.log('📱 Vérification éléments:', {
-                            controls: !!controls,
-                            buttonsCount: buttons.length,
-                            progressBar: !!progressBar
-                        });
-                        
-                        mobileNav.initScrollTracking();
-                    }, 1000);
-                } else {
-                    console.log('📱 Appareil non mobile détecté, navigation tactile désactivée');
-                }
-            }, 1000);
-        });
     </script>
 </body>
 </html>
