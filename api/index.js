@@ -1,6 +1,6 @@
-import express from 'express';
-import { put, list, del } from '@vercel/blob';
-import path from 'path';
+const express = require('express');
+const { put, list } = require('@vercel/blob');
+const path = require('path');
 
 const app = express();
 
@@ -14,23 +14,21 @@ app.use(express.static(path.join(__dirname, '..')));
 
 // Endpoint pour l'upload d'images
 app.post('/api/upload', async (req, res) => {
-  if (!req.body || !req.body.fileName) {
-    return res.status(400).json({ error: 'Nom de fichier manquant.' });
+  const { fileName, fileContent } = req.body;
+
+  if (!fileName || !fileContent) {
+    return res.status(400).json({ error: 'fileName et fileContent sont requis.' });
   }
 
   try {
-    const { fileName, fileContent } = req.body; // fileContent est attendu en base64
-    const fileBuffer = Buffer.from(fileContent, 'base64');
-    
-    const blob = await put(fileName, fileBuffer, {
+    const buffer = Buffer.from(fileContent, 'base64');
+    const blob = await put(fileName, buffer, {
       access: 'public',
-      contentType: req.headers['content-type'] || 'application/octet-stream'
     });
-    
     res.status(200).json(blob);
   } catch (error) {
-    console.error('Erreur Vercel Blob:', error);
-    res.status(500).json({ error: error.message });
+    console.error(`Erreur lors de l'upload de ${fileName}:`, error);
+    res.status(500).json({ error: "L'upload du fichier a échoué", details: error.message });
   }
 });
 
@@ -40,9 +38,9 @@ app.get('/api/images', async (req, res) => {
     const { blobs } = await list();
     res.status(200).json(blobs);
   } catch (error) {
-    console.error('Erreur Vercel Blob:', error);
-    res.status(500).json({ error: error.message });
+    console.error("Erreur lors de la récupération des images:", error);
+    res.status(500).json({ error: "Impossible de récupérer les images", details: error.message });
   }
 });
 
- 
+module.exports = app; 
