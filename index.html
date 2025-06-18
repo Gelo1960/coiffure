@@ -506,8 +506,16 @@
         const imageModal = document.getElementById('imageModal');
         
         document.addEventListener('DOMContentLoaded', () => {
-            // La logique d'initialisation a été déplacée dans loadInitialImages
-            // pour s'assurer que les images de Vercel Blob sont chargées avant tout.
+            // On n'attend plus les images de Vercel Blob pour l'initialisation.
+            // La galerie est initialisée directement avec les images locales.
+            gallery = new InteractiveGallery('gallery-container', [...images]);
+            gallery.init();
+            
+            magneticCursor = new MagneticCursor();
+            musicPlayer = new MusicPlayer();
+            const musicMenuElement = document.getElementById('musicMenu');
+            const musicMenuHandle = document.getElementById('musicMenuHandle');
+            draggableMenu = new Draggable(musicMenuElement, musicMenuHandle);
 
             imageModal.addEventListener('click', (e) => { if(e.target === imageModal) closeModal(); });
             document.getElementById('closeModalBtn').addEventListener('click', closeModal);
@@ -540,7 +548,7 @@
                         .then(response => response.json())
                         .then(blob => {
                             if (blob.url) {
-                                // On utilise l'URL retournée par Vercel Blob
+                                // On utilise l'URL retournée par Vercel Blob et on l'ajoute à la galerie
                                 gallery.addUserImage(blob.url);
                             } else {
                                 console.error("L'upload Vercel Blob a échoué.", blob.error);
@@ -551,44 +559,6 @@
                     reader.readAsDataURL(file); // Convertit l'image en URL de données (contenant du base64)
                 }
             });
-
-            // Charger les images initiales (existantes + uploadées depuis Vercel Blob)
-            async function loadInitialImages() {
-                let uploadedImages = [];
-                try {
-                    const response = await fetch('/api/images');
-                    if (!response.ok) {
-                       throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    const blobs = await response.json();
-                    // Assurez-vous que 'blobs' est bien un tableau
-                    if (Array.isArray(blobs)) {
-                        uploadedImages = blobs.map(blob => ({
-                            src: blob.url,
-                            title: 'Image Ajoutée'
-                        }));
-                    } else {
-                        console.error("La réponse de /api/images n'est pas un tableau:", blobs);
-                    }
-                } catch (error) {
-                    console.error("Impossible de charger les images depuis Vercel Blob:", error);
-                }
-
-                // Fusionner les images locales et celles de Vercel
-                const allImages = [...images, ...uploadedImages];
-                
-                // Initialiser la galerie et les autres composants
-                gallery = new InteractiveGallery('gallery-container', allImages);
-                gallery.init();
-                
-                magneticCursor = new MagneticCursor();
-                musicPlayer = new MusicPlayer();
-                const musicMenuElement = document.getElementById('musicMenu');
-                const musicMenuHandle = document.getElementById('musicMenuHandle');
-                draggableMenu = new Draggable(musicMenuElement, musicMenuHandle);
-            }
-
-            loadInitialImages();
         });
 
         function openModal(src) { if (imageModal.classList.contains('active')) return; gallery.togglePause(true); mainContainer.classList.add('modal-open'); imageModal.classList.add('active'); document.getElementById('modalImage').src = src; }
