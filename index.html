@@ -21,46 +21,6 @@
         /* Détection mobile */
         @media (pointer: coarse) and (max-width: 768px) {
             
-            body {
-                overflow-y: auto !important;
-                cursor: auto;
-                height: auto;
-            }
-
-            .container {
-                height: auto;
-                overflow: visible;
-                perspective: none;
-            }
-
-            #galleryContainer {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr); /* Grille de 2 colonnes */
-                gap: 15px;
-                padding: 15px;
-                position: relative !important;
-                transform: none !important;
-                width: 100%;
-                height: auto;
-            }
-
-            .image-wrapper {
-                position: relative !important;
-                width: 100% !important;
-                height: auto !important;
-                top: auto !important;
-                left: auto !important;
-                transform: none !important;
-                opacity: 1 !important;
-                margin: 0 !important;
-            }
-
-            .image-wrapper img {
-                width: 100%;
-                height: auto;
-                border-radius: 12px;
-            }
-
             /* CONTRÔLES MOBILES VISUELS */
             .mobile-nav-controls {
                 position: fixed;
@@ -137,7 +97,14 @@
 
             /* ZONE DE SWIPE INVISIBLE */
             .swipe-zone {
-               display: none; /* On s'assure que ca n'interfère pas */
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 120px; /* Laisse de la place pour les contrôles du bas */
+                z-index: 500;
+                /* pointer-events: auto; */ /* Le JS s'en charge si nécessaire */
+                touch-action: none; /* Empêche le navigateur de gérer le scroll */
             }
 
             /* CURSEUR MASQUÉ SUR MOBILE */
@@ -182,32 +149,6 @@
                     padding-bottom: max(15px, env(safe-area-inset-bottom));
                 }
             }
-        }
-
-        /* Styles pour la galerie mobile */
-        .mobile-active #galleryContainer {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 10px;
-            padding: 20px;
-            padding-bottom: 120px; /* Espace pour les contrôles de navigation */
-        }
-
-        .mobile-active .image-wrapper {
-            position: relative !important;
-            width: 100% !important;
-            height: auto !important;
-            top: auto !important;
-            left: auto !important;
-            transform: none !important;
-            opacity: 1 !important;
-        }
-
-        .mobile-active .image-wrapper img {
-            width: 100%;
-            height: auto;
-            display: block;
-            border-radius: 8px;
         }
     </style>
     <style>

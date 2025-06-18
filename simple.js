@@ -7,60 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Le conteneur de la galerie n'a pas été trouvé.");
         return;
     }
-    const imageFiles = [
-        "048a68e7-6d68-441e-beaf-2df8fb072878.png", "0559abc8-612a-4029-ab11-94fa7addae42.png",
-        "0ee7be81-0e68-4395-8d7d-ebc12cd5b34b.png", "105fae53-5078-4219-b680-6e95b68fcbe5.png",
-        "12b22a5c-cf0e-4368-a301-dc00fbbba8e6.png", "133f5cfc-d3d6-4619-9128-13564a70d1a5.png",
-        "193d6ddb-56c2-4428-9419-46eb026535ed.png", "1adaf727-ef73-4c82-9848-7b69bdfe13a5.png",
-        "213f9864-1021-4291-87d0-711c60d926ca.png", "233b357d-0350-4174-b320-cf729e7da468.png",
-        "2e5b5d56-07cf-4bd4-b8b8-11d8bc7cc9bf.png", "337046c4-031d-42bc-9a09-49b18b8853ee.png",
-        "374bd60c-c35d-4396-b19c-746657c252a1.png", "3e5a2bb4-1e9f-4579-95d0-a08f4daae8c3.png",
-        "3e5e22ce-f43f-4edf-8036-c1d24e12c6d2.png", "50f6a168-715f-467f-9f52-ce08398d6cea.png",
-        "51b615f7-6a32-4bf3-b3c8-7b2598fe8ee9.png", "54d49991-c607-4223-b549-fe8d08cc97fe.png",
-        "56905e4d-4496-4241-8c1e-18ebd9876195.png", "5f7fd6b4-1531-41ee-aa27-20d0dedae753.png",
-        "66041364-62c8-415a-9c35-dab10345c28d.png", "664a4222-b9ed-41f6-93b3-51c373203c6a.png",
-        "6684df14-bf64-4e1a-b422-2dbdec5b7c03.png", "6cbf57d2-a298-478f-a892-a157807dc8e4.png",
-        "71810122-7844-47c1-aa8c-1e7186ed075f.png", "71a775f1-db13-4d19-8aff-ddb8f45e18f7.png",
-        "75e863cd-ab70-42bb-a4e0-addc0bfa3e6f.png", "775d11be-f907-403f-a6a9-d2348da8ad36.png",
-        "7ce8e36d-a4c8-4076-a498-3bf89c0ef98d.png", "7dafe693-b94b-4876-b850-46b74f907f7d.png",
-        "7e9d423b-948e-49a3-b6e6-c3edec7cfc19.png", "8d4920dd-a2cf-445a-bf73-a1a22f20c978.png",
-        "8f814cb6-ed98-4f21-af15-d63d565e8db3.png", "9240b764-b37e-418b-8526-0ac3524082a6.png",
-        "9497ead6-5e9a-45d8-84ab-6f1694276f02.png", "98807c75-8e19-45b3-95f4-5ffd1dcc6940.png",
-        "9a01a209-bd03-4fcc-9801-bbfb57c549a8.png", "a1548b68-4652-4815-9169-133f2fe53610.png",
-        "a9359946-d2ef-4443-a269-144e4eec4235.png", "af49d2ae-96cc-466a-bc4a-68ccc9091322.png",
-        "b5b8baf0-56d9-46a1-a7bb-6fec91984111.png", "b6ee79eb-58e7-4fbb-bccb-e373ba24084a.png",
-        "bb72d7d2-8079-446c-b824-996d09223f7c.png", "bd5c34ba-f73a-4d87-8366-04271e204b1b.png",
-        "c49ef9e9-1e9a-4b88-a8f3-d69a9070165c.png", "c8241bf9-43b7-4e91-98b1-66c3229b1c10.png",
-        "c9dc96e1-25e2-4eab-b8c2-7a42816034d8.png", "cac1daf7-115c-45c4-82cf-fce0cc0ac1ad.png",
-        "cb1f055a-b3ed-459e-b572-1ff97b7b10df.png", "d011c66c-cab0-4d58-9cc0-04d09453e0b6.png",
-        "d0896f68-7113-4b7d-9dac-45c2863844a8.png", "d37ce9df-6761-43dc-892d-cfb21308c1cd.png",
-        "d7d6906e-ae27-4ef6-becb-95fc00e37cf1.png", "d8cd9691-ad65-48dc-a903-8497d2612c20.png",
-        "e72c0550-8324-4cc0-9f3a-38caf6f4862c.png", "e9974373-243f-468b-93d0-bb8436021b6f.png",
-        "f10e668f-8c42-464d-9cec-3f5b5436f779.png", "f2e0d5f7-2bcf-4d0d-a24c-24cc4fb3dedc.png",
-        "fb72dfba-3ddb-4d5d-9598-e80357b63ad3.png"
-    ];
-
-    const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-
-    if (isMobile) {
-        document.body.classList.add('mobile-active');
-        initMobileGallery();
-        return;
-    }
-    
-    function initMobileGallery() {
-        galleryContainer.innerHTML = ''; // Vider le conteneur
-        imageFiles.forEach(fileName => {
-            const imgWrapper = document.createElement('div');
-            imgWrapper.className = 'image-wrapper';
-            const img = document.createElement('img');
-            img.src = `images-inspiration-coiffures-africain/${fileName}`;
-            img.alt = `Inspiration coiffure`;
-            img.loading = 'lazy';
-            imgWrapper.appendChild(img);
-            galleryContainer.appendChild(imgWrapper);
-        });
-    }
 
     const IMG_WIDTH = 220;
     const IMG_HEIGHT = 220;
@@ -163,8 +109,48 @@ document.addEventListener('DOMContentLoaded', () => {
         "fb72dfba-3ddb-4d5d-9598-e80357b63ad3.png": { title: "Coupe Courte", description: "Coupe moderne et élégante", category: "court" }
     };
 
+    // Liste complète des images
+    const imageFiles = [
+        "048a68e7-6d68-441e-beaf-2df8fb072878.png", "0559abc8-612a-4029-ab11-94fa7addae42.png",
+        "0ee7be81-0e68-4395-8d7d-ebc12cd5b34b.png", "105fae53-5078-4219-b680-6e95b68fcbe5.png",
+        "12b22a5c-cf0e-4368-a301-dc00fbbba8e6.png", "133f5cfc-d3d6-4619-9128-13564a70d1a5.png",
+        "193d6ddb-56c2-4428-9419-46eb026535ed.png", "1adaf727-ef73-4c82-9848-7b69bdfe13a5.png",
+        "213f9864-1021-4291-87d0-711c60d926ca.png", "233b357d-0350-4174-b320-cf729e7da468.png",
+        "2e5b5d56-07cf-4bd4-b8b8-11d8bc7cc9bf.png", "337046c4-031d-42bc-9a09-49b18b8853ee.png",
+        "374bd60c-c35d-4396-b19c-746657c252a1.png", "3e5a2bb4-1e9f-4579-95d0-a08f4daae8c3.png",
+        "3e5e22ce-f43f-4edf-8036-c1d24e12c6d2.png", "50f6a168-715f-467f-9f52-ce08398d6cea.png",
+        "51b615f7-6a32-4bf3-b3c8-7b2598fe8ee9.png", "54d49991-c607-4223-b549-fe8d08cc97fe.png",
+        "56905e4d-4496-4241-8c1e-18ebd9876195.png", "5f7fd6b4-1531-41ee-aa27-20d0dedae753.png",
+        "66041364-62c8-415a-9c35-dab10345c28d.png", "664a4222-b9ed-41f6-93b3-51c373203c6a.png",
+        "6684df14-bf64-4e1a-b422-2dbdec5b7c03.png", "6cbf57d2-a298-478f-a892-a157807dc8e4.png",
+        "71810122-7844-47c1-aa8c-1e7186ed075f.png", "71a775f1-db13-4d19-8aff-ddb8f45e18f7.png",
+        "75e863cd-ab70-42bb-a4e0-addc0bfa3e6f.png", "775d11be-f907-403f-a6a9-d2348da8ad36.png",
+        "7ce8e36d-a4c8-4076-a498-3bf89c0ef98d.png", "7dafe693-b94b-4876-b850-46b74f907f7d.png",
+        "7e9d423b-948e-49a3-b6e6-c3edec7cfc19.png", "8d4920dd-a2cf-445a-bf73-a1a22f20c978.png",
+        "8f814cb6-ed98-4f21-af15-d63d565e8db3.png", "9240b764-b37e-418b-8526-0ac3524082a6.png",
+        "9497ead6-5e9a-45d8-84ab-6f1694276f02.png", "98807c75-8e19-45b3-95f4-5ffd1dcc6940.png",
+        "9a01a209-bd03-4fcc-9801-bbfb57c549a8.png", "a1548b68-4652-4815-9169-133f2fe53610.png",
+        "a9359946-d2ef-4443-a269-144e4eec4235.png", "af49d2ae-96cc-466a-bc4a-68ccc9091322.png",
+        "b5b8baf0-56d9-46a1-a7bb-6fec91984111.png", "b6ee79eb-58e7-4fbb-bccb-e373ba24084a.png",
+        "bb72d7d2-8079-446c-b824-996d09223f7c.png", "bd5c34ba-f73a-4d87-8366-04271e204b1b.png",
+        "c49ef9e9-1e9a-4b88-a8f3-d69a9070165c.png", "c8241bf9-43b7-4e91-98b1-66c3229b1c10.png",
+        "c9dc96e1-25e2-4eab-b8c2-7a42816034d8.png", "cac1daf7-115c-45c4-82cf-fce0cc0ac1ad.png",
+        "cb1f055a-b3ed-459e-b572-1ff97b7b10df.png", "d011c66c-cab0-4d58-9cc0-04d09453e0b6.png",
+        "d0896f68-7113-4b7d-9dac-45c2863844a8.png", "d37ce9df-6761-43dc-892d-cfb21308c1cd.png",
+        "d7d6906e-ae27-4ef6-becb-95fc00e37cf1.png", "d8cd9691-ad65-48dc-a903-8497d2612c20.png",
+        "e72c0550-8324-4cc0-9f3a-38caf6f4862c.png", "e9974373-243f-468b-93d0-bb8436021b6f.png",
+        "f10e668f-8c42-464d-9cec-3f5b5436f779.png", "f2e0d5f7-2bcf-4d0d-a24c-24cc4fb3dedc.png",
+        "fb72dfba-3ddb-4d5d-9598-e80357b63ad3.png"
+    ];
+
     // Initialiser les images filtrées
     filteredImages = [...imageFiles];
+
+    // Ajout des variables pour la gestion tactile
+    let touchStartY = 0;
+    let isTouching = false;
+    let touchMoveDelta = 0;
+    const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
     let imageWrappers = [];
     let currentRotationAngle = 0;
@@ -176,6 +162,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Effet de parallax subtil pour le curseur
     function initCursorEffects() {
+        // Pas d'effet de curseur sur mobile
+        if(isMobile) return;
+
         document.addEventListener('mousemove', (e) => {
             mouseX = e.clientX;
             mouseY = e.clientY;
@@ -315,6 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // D'abord, on initialise les effets de base.
     initCursorEffects();
+    initTouchControls(); // Initialiser les contrôles tactiles
     addDynamicStyles();
     
     // Supprimer l'ancienne création d'images et utiliser la nouvelle fonction
@@ -432,21 +422,23 @@ document.addEventListener('DOMContentLoaded', () => {
         hideLoadingScreen();
         updateImageCounter();
         
-        if (!isMobile) {
-            // Transition vers ligne après 4 secondes
-            setTimeout(() => {
-                console.log('Phase 2: Ligne'); // Debug
-                switchToMode('line');
-            }, 4000);
+        // Transition vers ligne après 4 secondes
+        setTimeout(() => {
+            console.log('Phase 2: Ligne'); // Debug
+            switchToMode('line');
+        }, 4000);
+        
+        // Transition vers cercle après 8 secondes
+        setTimeout(() => {
+            console.log('Phase 3: Cercle'); // Debug
+            switchToMode('circle');
+            isPlaying = true; // Activer la rotation automatique
             
-            // Transition vers cercle après 8 secondes
-            setTimeout(() => {
-                console.log('Phase 3: Cercle'); // Debug
-                switchToMode('circle');
-                isPlaying = true; // Activer la rotation automatique
+            // Ne pas démarrer la rotation auto sur mobile, elle sera contrôlée par le toucher
+            if (!isMobile) {
                 startRotationAnimation();
-            }, 8000);
-        }
+            }
+        }, 8000);
     }, 100);
 
     // Fonction pour filtrer les images
@@ -628,12 +620,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function rotateAndUpdateVisibleCircle() {
-        if (isHovering) {
+        // La rotation est manuelle sur mobile via le toucher
+        if (isMobile && !isTouching) {
+             requestAnimationFrame(rotateAndUpdateVisibleCircle);
+             return;
+        }
+        if (isHovering && !isMobile) {
             animationFrameId = requestAnimationFrame(rotateAndUpdateVisibleCircle);
             return;
         }
 
-        currentRotationAngle += ROTATION_SPEED_DEGREES;
+        if(!isMobile) {
+            currentRotationAngle += ROTATION_SPEED_DEGREES;
+        }
 
         // 1. Rotation des images visibles
         for (let i = 0; i < VISIBLE_IMAGES_IN_CIRCLE; i++) {
@@ -686,9 +685,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startRotationAnimation() {
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        // Ne pas démarrer la rotation si on est sur mobile
+        if(isMobile) return;
         console.log('Rotation démarrée avec rotateAndUpdateVisibleCircle');
         lastReplacementAngle = currentRotationAngle; // S'assurer que c'est à jour avant de commencer
         animationFrameId = requestAnimationFrame(rotateAndUpdateVisibleCircle);
+    }
+
+    // Initialisation des contrôles tactiles
+    function initTouchControls() {
+        if (!isMobile) return;
+        
+        const swipeZone = document.querySelector('.swipe-zone');
+        if (!swipeZone) return;
+
+        swipeZone.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 0) {
+                touchStartY = e.touches[0].clientY;
+                isTouching = true;
+                isHovering = true; // Pause la rotation auto
+            }
+        }, { passive: true });
+
+        swipeZone.addEventListener('touchmove', (e) => {
+            if (isTouching && e.touches.length > 0) {
+                const currentY = e.touches[0].clientY;
+                touchMoveDelta = currentY - touchStartY;
+                
+                // Appliquer une rotation basée sur le mouvement, inversé pour un feeling naturel
+                currentRotationAngle -= touchMoveDelta * 0.1;
+                
+                // Mettre à jour la position de départ pour le prochain mouvement
+                touchStartY = currentY;
+            }
+        }, { passive: true });
+
+        swipeZone.addEventListener('touchend', () => {
+            isTouching = false;
+            isHovering = false; // Reprend la rotation auto
+        });
     }
 
     console.log(`${imageFiles.length} images prêtes pour l'animation.`);
