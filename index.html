@@ -506,10 +506,8 @@
         const imageModal = document.getElementById('imageModal');
         
         document.addEventListener('DOMContentLoaded', () => {
-            // On n'attend plus les images de Vercel Blob pour l'initialisation.
-            // La galerie est initialisée directement avec les images locales.
-            gallery = new InteractiveGallery('gallery-container', [...images]);
-            gallery.init();
+            // On initialise la galerie directement avec les images locales.
+            gallery = new InteractiveGallery('gallery-container', images);
             
             magneticCursor = new MagneticCursor();
             musicPlayer = new MusicPlayer();
