@@ -128,17 +128,23 @@
         .close-modal { position: absolute; top: -15px; right: -15px; background: rgba(0,0,0,0.5); border: 2px solid white; border-radius: 50%; width: 40px; height: 40px; color: white; font-size: 22px; transition: all 0.3s ease; cursor: pointer; }
         .close-modal:hover { background: var(--accent-color); transform: rotate(90deg); border-color: var(--accent-color);}
 
-        /* --- STYLES RESPONSIVES POUR MOBILE --- */
+        /* --- STYLES RESPONSIVES POUR MOBILE (Version fusionnée) --- */
         @media (max-width: 768px) {
             /* Réduire la taille des polices de texte pour une meilleure lisibilité sur mobile */
             .story-text-overlay.size-l {
-                font-size: clamp(3rem, 10vw, 5rem); /* Original: clamp(6rem, 12vw, 12rem) */
+                font-size: clamp(3rem, 10vw, 5rem);
             }
             .story-text-overlay.size-m {
-                font-size: clamp(1.8rem, 4vw, 2.5rem); /* Original: clamp(2.5rem, 5vw, 4rem) */
+                font-size: clamp(1.8rem, 4vw, 2.5rem);
             }
             .story-text-overlay.size-s {
-                font-size: clamp(1rem, 2.5vw, 1.5rem); /* Original: clamp(1.5rem, 3vw, 2rem) */
+                font-size: clamp(1rem, 2.5vw, 1.5rem);
+            }
+
+            /* Forcer le texte à aller à la ligne pour ne pas déborder */
+            .story-text-overlay {
+                overflow-wrap: break-word;
+                max-width: 90% !important; 
             }
 
             /* Réduire la taille des contrôles pour économiser de l'espace */
@@ -149,6 +155,15 @@
             .controls .control-btn {
                 padding: 8px 12px;
                 font-size: 0.8rem;
+            }
+        }
+
+        /* Support des encoches d'iPhone */
+        @supports (padding: max(0px)) {
+            @media (pointer: coarse) and (max-width: 768px) {
+                .mobile-nav-controls {
+                    padding-bottom: max(15px, env(safe-area-inset-bottom));
+                }
             }
         }
     </style>
@@ -179,6 +194,9 @@
 
         <div class="controls">
             <button class="control-btn magnetic-target" id="pauseBtn">⏸️ Pause</button>
+            <button class="control-btn magnetic-target" id="uploadBtn">🖼️ Ajouter</button>
+            <input type="file" id="imageUpload" accept="image/*" style="display: none;" />
+            
             <button class="control-btn magnetic-target" onclick="gallery.reset()">🔄 Recommencer</button>
         </div>
     </div>
@@ -287,27 +305,71 @@
 
             addEventListeners() {
                 const isMobile = 'ontouchstart' in window;
-                let lastTouchY = 0;
-                const sensitivity = 1.5;
 
                 if (isMobile) {
+                    // --- NOUVELLE LOGIQUE DE DÉFILEMENT INERTIEL POUR MOBILE ---
+                    let lastY = 0;
+                    let startY = 0;
+                    let isDragging = false;
+                    
+                    // Historique pour calculer la vélocité du "flick"
+                    let touchHistory = [];
+                    const historySize = 5;
+
+                    const trackTouch = (y) => {
+                        touchHistory.push({ y, time: Date.now() });
+                        if (touchHistory.length > historySize) {
+                            touchHistory.shift();
+                        }
+                    };
+
                     this.container.addEventListener('touchstart', e => {
                         if (this.scroll.isPaused) return;
-                        lastTouchY = e.touches[0].clientY;
-                        this.scroll.velocity = 0;
+                        isDragging = true;
+                        this.scroll.velocity = 0; // Stoppe l'inertie immédiatement
+                        startY = lastY = e.touches[0].clientY;
+                        touchHistory = [];
+                        trackTouch(startY);
+                        
                         if(magneticCursor && magneticCursor.cursor) { magneticCursor.cursor.style.display = 'none'; }
                     }, { passive: true });
 
                     this.container.addEventListener('touchmove', e => {
-                        if (this.scroll.isPaused) return;
+                        if (this.scroll.isPaused || !isDragging) return;
                         const currentY = e.touches[0].clientY;
-                        const deltaY = lastTouchY - currentY;
-                        this.scroll.velocity += deltaY * sensitivity;
-                        lastTouchY = currentY;
+                        const deltaY = currentY - lastY;
+                        
+                        // Défilement direct 1:1 avec le doigt
+                        this.scroll.target -= deltaY * 1.5; // Ajuster le multiplicateur pour la sensibilité
+                        
+                        lastY = currentY;
+                        trackTouch(currentY);
                     }, { passive: true });
+
+                    const onTouchEnd = () => {
+                        if (this.scroll.isPaused || !isDragging) return;
+                        isDragging = false;
+
+                        if (touchHistory.length < 2) return;
+                        
+                        // Calcul de la vélocité pour l'effet "flick"
+                        const lastPoint = touchHistory[touchHistory.length - 1];
+                        const firstPoint = touchHistory[0];
+                        const timeDelta = lastPoint.time - firstPoint.time;
+                        const posDelta = lastPoint.y - firstPoint.y;
+                        
+                        if (timeDelta > 0) {
+                            const velocity = (posDelta / timeDelta) * -30; // Ajuster le multiplicateur pour la force de l'inertie
+                            this.scroll.velocity = velocity;
+                        }
+                    };
+
+                    this.container.addEventListener('touchend', onTouchEnd);
+                    this.container.addEventListener('touchcancel', onTouchEnd);
                     
                     this.container.style.touchAction = 'none';
                 } else {
+                    // --- Gestion Souris (inchangée) ---
                     window.addEventListener('wheel', e => { 
                         if (!this.scroll.isPaused) { this.scroll.velocity += e.deltaY * 0.06; } 
                     });
@@ -325,11 +387,9 @@
             }
 
             update() {
-                if (!this.scroll.isPaused) {
-                    this.scroll.target += this.scroll.velocity;
-                    this.scroll.target += this.scroll.baseVelocity;
-                    this.scroll.velocity *= this.scroll.friction;
-                }
+                this.scroll.target += this.scroll.velocity;
+                this.scroll.target += this.scroll.baseVelocity;
+                this.scroll.velocity *= this.scroll.friction;
                 this.scroll.current += (this.scroll.target - this.scroll.current) * 0.08; 
                 for (const item of this.items) {
                     const screenPos = (item.y - this.scroll.current) % this.virtualHeight;
@@ -366,6 +426,42 @@
             }
             
             reset() { this.scroll.target = 0; this.scroll.velocity = 0; this.populate(); magneticCursor.updateTargets(); clearInterval(this.hugeTextTimer); this.startHugeTextCycle(); }
+
+            // NOUVELLE MÉTHODE POUR AJOUTER UNE IMAGE
+            addUserImage(imageSrc) {
+                // Choisir une taille et une position aléatoire, comme pour les autres images
+                const isMobile = 'ontouchstart' in window;
+                const imageSizes = isMobile 
+                    ? [{w:180, h:132}, {w:228, h:168}, {w:270, h:204}] 
+                    : [{w:300, h:220}, {w:380, h:280}, {w:450, h:340}];
+                
+                const size = imageSizes[Math.floor(Math.random() * imageSizes.length)];
+                
+                const lanes = [ { xRange: [0.05, 0.25] }, { xRange: [0.38, 0.58] }, { xRange: [0.70, 0.90] } ];
+                const lane = lanes[Math.floor(Math.random() * lanes.length)];
+                const x = (lane.xRange[0] + Math.random() * (lane.xRange[1] - lane.xRange[0])) * window.innerWidth - size.w / 2;
+
+                // Positionner la nouvelle image juste devant la vue actuelle pour la voir apparaître
+                const y = this.scroll.current + window.innerHeight * 0.2;
+
+                // Créer l'élément DOM
+                const el = document.createElement('div');
+                el.className = 'gallery-item';
+                el.innerHTML = `<div class="image-container magnetic-target" style="width:${size.w}px; height:${size.h}px;"><img src="${imageSrc}" loading="lazy" /></div>`;
+                el.querySelector('.image-container').addEventListener('click', (e) => { e.stopPropagation(); openModal(imageSrc); });
+
+                // Ajouter l'élément à la galerie et à notre tableau d'items
+                const itemData = { el, y, x, rotation: (Math.random() - 0.5) * 8, height: size.h };
+                this.items.push(itemData);
+                this.container.appendChild(el);
+
+                // Mettre à jour les cibles magnétiques pour le curseur
+                magneticCursor.updateTargets();
+
+                // TODO: Pour une sauvegarde permanente, vous devriez envoyer
+                // l'image à un serveur ici, qui la sauvegarderait.
+                // fetch('/upload-endpoint', { method: 'POST', body: ... });
+            }
         }
 
         // --- DRAGGABLE CLASS ---
@@ -419,6 +515,26 @@
             draggableMenu = new Draggable(musicMenuElement, musicMenuHandle);
             imageModal.addEventListener('click', (e) => { if(e.target === imageModal) closeModal(); });
             document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+
+            // --- NOUVELLE LOGIQUE D'UPLOAD ---
+            const uploadBtn = document.getElementById('uploadBtn');
+            const imageUpload = document.getElementById('imageUpload');
+
+            uploadBtn.addEventListener('click', () => {
+                imageUpload.click(); // Ouvre la fenêtre de sélection de fichier
+            });
+
+            imageUpload.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        // On passe l'URL de l'image locale à notre galerie
+                        gallery.addUserImage(e.target.result);
+                    };
+                    reader.readAsDataURL(file); // Convertit l'image en une URL de données
+                }
+            });
         });
 
         function openModal(src) { if (imageModal.classList.contains('active')) return; gallery.togglePause(true); mainContainer.classList.add('modal-open'); imageModal.classList.add('active'); document.getElementById('modalImage').src = src; }
