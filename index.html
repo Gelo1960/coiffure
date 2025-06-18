@@ -219,8 +219,9 @@
         
         // --- INTERACTIVE GALLERY CLASS ---
         class InteractiveGallery {
-            constructor(containerId) {
+            constructor(containerId, imageList) {
                 this.container = document.getElementById(containerId);
+                this.images = imageList || [];
                 this.bgContainer = document.getElementById('background-elements-container');
                 this.items = [];
                 this.scroll = { current: 0, target: 0, velocity: 0, baseVelocity: -0.15, friction: 0.96, isPaused: false };
@@ -253,7 +254,7 @@
                 }
                 
                 const allContent = [];
-                const imagesCopy = [...images];
+                const imagesCopy = [...this.images];
                 const textsCopy = [...storyElements];
                 const imagesPerText = Math.floor(imagesCopy.length / (textsCopy.length || 1));
 
@@ -429,7 +430,6 @@
 
             // NOUVELLE MÉTHODE POUR AJOUTER UNE IMAGE
             addUserImage(imageSrc) {
-                // Choisir une taille et une position aléatoire, comme pour les autres images
                 const isMobile = 'ontouchstart' in window;
                 const imageSizes = isMobile 
                     ? [{w:180, h:132}, {w:228, h:168}, {w:270, h:204}] 
@@ -454,13 +454,12 @@
                 const itemData = { el, y, x, rotation: (Math.random() - 0.5) * 8, height: size.h };
                 this.items.push(itemData);
                 this.container.appendChild(el);
+                
+                // On met aussi à jour la liste source pour la cohérence
+                this.images.push({ src: imageSrc, title: 'Nouvelle Image' });
 
                 // Mettre à jour les cibles magnétiques pour le curseur
                 magneticCursor.updateTargets();
-
-                // TODO: Pour une sauvegarde permanente, vous devriez envoyer
-                // l'image à un serveur ici, qui la sauvegarderait.
-                // fetch('/upload-endpoint', { method: 'POST', body: ... });
             }
         }
 
@@ -507,12 +506,9 @@
         const imageModal = document.getElementById('imageModal');
         
         document.addEventListener('DOMContentLoaded', () => {
-            gallery = new InteractiveGallery('gallery-container');
-            magneticCursor = new MagneticCursor();
-            musicPlayer = new MusicPlayer();
-            const musicMenuElement = document.getElementById('musicMenu');
-            const musicMenuHandle = document.getElementById('musicMenuHandle');
-            draggableMenu = new Draggable(musicMenuElement, musicMenuHandle);
+            // La logique d'initialisation a été déplacée dans loadInitialImages
+            // pour s'assurer que les images de Vercel Blob sont chargées avant tout.
+
             imageModal.addEventListener('click', (e) => { if(e.target === imageModal) closeModal(); });
             document.getElementById('closeModalBtn').addEventListener('click', closeModal);
 
@@ -561,17 +557,27 @@
                 let uploadedImages = [];
                 try {
                     const response = await fetch('/api/images');
+                    if (!response.ok) {
+                       throw new Error(`HTTP error! status: ${response.status}`);
+                    }
                     const blobs = await response.json();
-                    uploadedImages = blobs.map(blob => ({
-                        src: blob.url,
-                        title: 'Image Ajoutée'
-                    }));
+                    // Assurez-vous que 'blobs' est bien un tableau
+                    if (Array.isArray(blobs)) {
+                        uploadedImages = blobs.map(blob => ({
+                            src: blob.url,
+                            title: 'Image Ajoutée'
+                        }));
+                    } else {
+                        console.error("La réponse de /api/images n'est pas un tableau:", blobs);
+                    }
                 } catch (error) {
                     console.error("Impossible de charger les images depuis Vercel Blob:", error);
                 }
 
+                // Fusionner les images locales et celles de Vercel
                 const allImages = [...images, ...uploadedImages];
                 
+                // Initialiser la galerie et les autres composants
                 gallery = new InteractiveGallery('gallery-container', allImages);
                 gallery.init();
                 
