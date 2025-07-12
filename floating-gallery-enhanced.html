@@ -1352,6 +1352,7 @@
 
         // Configuration des images
         const images = [
+            // Images originales
             { src: 'images-inspiration-coiffures-africain/048a68e7-6d68-441e-beaf-2df8fb072878.png', title: 'Style Afro Naturel', description: 'Coiffure naturelle élégante' },
             { src: 'images-inspiration-coiffures-africain/0559abc8-612a-4029-ab11-94fa7addae42.png', title: 'Tresses Sophistiquées', description: 'Tressage moderne et stylé' },
             { src: 'images-inspiration-coiffures-africain/0ee7be81-0e68-4395-8d7d-ebc12cd5b34b.png', title: 'Look Moderne', description: 'Style contemporain' },
@@ -1410,12 +1411,32 @@
             { src: 'images-inspiration-coiffures-africain/e9974373-243f-468b-93d0-bb8436021b6f.png', title: 'Look Extraordinaire', description: 'Au-delà de l\'ordinaire' },
             { src: 'images-inspiration-coiffures-africain/f10e668f-8c42-464d-9cec-3f5b5436f779.png', title: 'Style Merveilleux', description: 'Émerveillement garanti' },
             { src: 'images-inspiration-coiffures-africain/f2e0d5f7-2bcf-4d0d-a24c-24cc4fb3dedc.png', title: 'Coiffure Splendide', description: 'Éclat et magnificence' },
-            { src: 'images-inspiration-coiffures-africain/fb72dfba-3ddb-4d5d-9598-e80357b63ad3.png', title: 'Tresses Finales', description: 'Apothéose de beauté' }
+            { src: 'images-inspiration-coiffures-africain/fb72dfba-3ddb-4d5d-9598-e80357b63ad3.png', title: 'Tresses Finales', description: 'Apothéose de beauté' },
+            
+            // Nouvelles images
+            { src: 'images-inspiration-coiffures-africain/nouvelle coiffure/temp_image_006F08B2-D91C-491E-9E1D-899E694FDBBC.WEBP', title: 'Coiffure Élégante', description: 'Style raffiné et sophistiqué' },
+            { src: 'images-inspiration-coiffures-africain/nouvelle coiffure/temp_image_02C37573-96A2-4052-97A7-9E59BA3B45F6.WEBP', title: 'Tresses Artistiques', description: 'Création unique et originale' },
+            { src: 'images-inspiration-coiffures-africain/nouvelle coiffure/temp_image_0E1D7EA1-A454-4984-91AF-69256E04D1FE.WEBP', title: 'Style Contemporain', description: 'Modernité et élégance' },
+            { src: 'images-inspiration-coiffures-africain/nouvelle coiffure/temp_image_2E0C8215-010E-4CAD-BC61-CE05A7DF3753.WEBP', title: 'Coiffure Minimaliste', description: 'Simplicité et beauté naturelle' },
+            { src: 'images-inspiration-coiffures-africain/nouvelle coiffure/temp_image_484DFC5D-A823-4A19-9941-C06579E84995.WEBP', title: 'Tresses Complexes', description: 'Motifs élaborés et détaillés' },
+            { src: 'images-inspiration-coiffures-africain/nouvelle coiffure/temp_image_520E028D-EAF6-4A95-A493-5727DD7E0A1D.WEBP', title: 'Style Audacieux', description: 'Expression forte et affirmée' },
+            { src: 'images-inspiration-coiffures-africain/nouvelle coiffure/temp_image_5D8155E1-5260-47EC-80EE-4434F1044479.WEBP', title: 'Coiffure Structurée', description: 'Architecture capillaire impressionnante' },
+            { src: 'images-inspiration-coiffures-africain/nouvelle coiffure/temp_image_7B1661EE-AA22-44BF-85F8-2124AB1F5999.WEBP', title: 'Tresses Innovantes', description: 'Créativité et originalité' },
+            { src: 'images-inspiration-coiffures-africain/nouvelle coiffure/temp_image_918C7DEF-B242-4E50-98D3-B7C04E0E8EC4.WEBP', title: 'Style Fusion', description: 'Mélange harmonieux de traditions' },
+            { src: 'images-inspiration-coiffures-africain/nouvelle coiffure/temp_image_9B9E74AC-375F-48E9-A415-107127E2ED55.WEBP', title: 'Coiffure Épurée', description: 'Élégance minimaliste' },
+            { src: 'images-inspiration-coiffures-africain/nouvelle coiffure/temp_image_AC248B74-2794-469D-9EAA-BB256B01C707.WEBP', title: 'Tresses Géométriques', description: 'Motifs précis et symétriques' },
+            { src: 'images-inspiration-coiffures-africain/nouvelle coiffure/temp_image_C5C84501-A473-4216-9918-3C0746658B74.WEBP', title: 'Style Majestueux', description: 'Grandeur et prestance' },
+            { src: 'images-inspiration-coiffures-africain/nouvelle coiffure/temp_image_D39F47FE-1788-4B92-B26B-08942DAB6FC9.WEBP', title: 'Coiffure Dynamique', description: 'Mouvement et fluidité' },
+            { src: 'images-inspiration-coiffures-africain/nouvelle coiffure/temp_image_E515E893-65B2-41CC-A5C5-FCF136F56B88.WEBP', title: 'Tresses Délicates', description: 'Finesse et précision' },
+            { src: 'images-inspiration-coiffures-africain/nouvelle coiffure/temp_image_ECBEB844-8F20-4071-8929-3A95908CED65.WEBP', title: 'Style Harmonieux', description: 'Équilibre et proportion parfaite' },
+            { src: 'images-inspiration-coiffures-africain/nouvelle coiffure/temp_image_F0AB2154-B04A-46DD-A847-1ADD084EE6CE.WEBP', title: 'Coiffure Expressive', description: 'Personnalité et caractère' },
+            { src: 'images-inspiration-coiffures-africain/nouvelle coiffure/temp_image_FF70106E-CF01-4546-9C7E-DA9A0E972668.WEBP', title: 'Tresses Royales', description: 'Noblesse et distinction' }
         ];
 
         let gallery = document.getElementById('gallery');
         let currentSpeed = 'normal';
         let animationIntervals = [];
+        let imageIndex = 0; // Index pour suivre l'image actuelle à afficher
         let textIndex = 0;
         let imageGroupCounter = 0;
         
@@ -1537,8 +1558,12 @@
             const spawnInterval = getSpawnInterval();
             
             const interval = setInterval(() => {
-                const randomImage = images[Math.floor(Math.random() * images.length)];
-                createFloatingImage(randomImage);
+                // Utiliser imageIndex pour parcourir séquentiellement toutes les images
+                const currentImage = images[imageIndex];
+                createFloatingImage(currentImage);
+                
+                // Passer à l'image suivante, revenir au début si on atteint la fin
+                imageIndex = (imageIndex + 1) % images.length;
                 
                 // Créer un texte flottant occasionnellement (tous les 3-4 groupes d'images)
                 if (imageGroupCounter % 3 === 0) {
@@ -1585,6 +1610,7 @@
             // Réinitialiser les compteurs
             textIndex = 0;
             imageGroupCounter = 0;
+            imageIndex = 0; // Réinitialiser l'index des images
         }
 
         // Modal functions
